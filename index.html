@@ -20,40 +20,37 @@ canvas{
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 20px;
 }
 input, button{
     padding: 10px;
     font-size: 16px;
 }
-label{
-    font-weight: bold;
-}
 </style>
 </head>
 <body>
 
-<h1>Генератор мотиваційних фото</h1>
+<h1>Генератор фото</h1>
 
 <div class="controls">
     <input type="file" id="imageInput" accept="image/*">
-    <input type="text" id="textInput" placeholder="Введи текст зверху">
-    
-    <label>Розмір пікселів: <span id="pixelValue">20</span></label>
+    <input type="text" id="textInput" placeholder="Введи текст">
+
+    <label>Ширина тексту (X): <span id="textWidthValue">1000</span></label>
+    <input type="range" id="textWidth" min="300" max="1080" value="1000">
+
+    <label>Розмір тексту (Y): <span id="fontSizeValue">110</span></label>
+    <input type="range" id="fontSize" min="40" max="200" value="110">
+
+    <label>Пікселізація: <span id="pixelValue">20</span></label>
     <input type="range" id="pixelSize" min="5" max="80" value="20">
-    
+
     <button onclick="generateImages()">Згенерувати</button>
 </div>
 
-<h2>Звичайне фото</h2>
+<br>
 <canvas id="canvas1" width="1080" height="1080"></canvas>
 <br>
-<a id="download1" download="normal.png">Скачати</a>
-
-<h2>Повністю пікселізоване фото</h2>
 <canvas id="canvas2" width="1080" height="1080"></canvas>
-<br>
-<a id="download2" download="pixelated.png">Скачати</a>
 
 <script>
 let uploadedImage = null;
@@ -70,109 +67,93 @@ document.getElementById("imageInput").addEventListener("change", e => {
     reader.readAsDataURL(file);
 });
 
-document.getElementById("pixelSize").addEventListener("input", e => {
-    document.getElementById("pixelValue").textContent = e.target.value;
-});
+function updateValue(sliderId, valueId){
+    document.getElementById(sliderId).addEventListener("input", e=>{
+        document.getElementById(valueId).textContent = e.target.value;
+    });
+}
 
-function splitToTwoLines(ctx, text, maxWidth){
-    let fontSize = 110;
+updateValue("textWidth", "textWidthValue");
+updateValue("fontSize", "fontSizeValue");
+updateValue("pixelSize", "pixelValue");
+
+function wrapText(ctx, text, maxWidth){
+    const words = text.toUpperCase().split(" ");
     let lines = [];
+    let line = "";
 
-    while(fontSize >= 40){
-        ctx.font = `bold px Arial`;
-        const words = text.toUpperCase().split(" ");
-        lines = [];
-        let line = "";
+    for(let word of words){
+        let test = line + word + " ";
 
-        for(let word of words){
-            let testLine = line + word + " ";
-
-            if(ctx.measureText(testLine).width > maxWidth && line !== ""){
-                lines.push(line.trim());
-                line = word + " ";
-            } else {
-                line = testLine;
-            }
+        if(ctx.measureText(test).width > maxWidth && line){
+            lines.push(line.trim());
+            line = word + " ";
+        } else {
+            line = test;
         }
-
-        lines.push(line.trim());
-
-        if(lines.length <= 2){
-            return { lines, fontSize };
-        }
-
-        fontSize -= 5;
     }
 
-    return {
-        lines: [lines[0] || "", lines.slice(1).join(" ")],
-        fontSize: 40
-    };
+    lines.push(line.trim());
+
+    if(lines.length > 2){
+        lines = [lines[0], lines.slice(1).join(" ")];
+    }
+
+    return lines;
 }
 
 function drawNormal(ctx){
     const canvas = ctx.canvas;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    const text = document.getElementById("textInput").value || "";
+    const text = document.getElementById("textInput").value;
+    const maxWidth = parseInt(document.getElementById("textWidth").value);
+    const fontSize = parseInt(document.getElementById("fontSize").value);
 
-    const result = splitToTwoLines(ctx, text, canvas.width - 80);
-    const lines = result.lines;
-    const fontSize = result.fontSize;
-
-    ctx.font = `bold px Arial`;
+    ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
+
+    const lines = wrapText(ctx, text, maxWidth);
 
     const lineHeight = fontSize + 10;
     const topHeight = lines.length * lineHeight + 60;
 
-    lines.forEach((line, index) => {
+    lines.forEach((line, i)=>{
         ctx.fillText(
             line,
             canvas.width / 2,
-            50 + fontSize + index * lineHeight
+            50 + fontSize + i * lineHeight
         );
     });
 
     if(uploadedImage){
-        const remainingHeight = canvas.height - topHeight;
-
-        // розтягує фото рівно під текст
         ctx.drawImage(
             uploadedImage,
             0,
             topHeight,
             canvas.width,
-            remainingHeight
+            canvas.height - topHeight
         );
     }
 }
 
-function pixelateWhole(sourceCanvas, targetCtx, pixelSize){
-    const tempCanvas = document.createElement("canvas");
-    const tempCtx = tempCanvas.getContext("2d");
+function pixelateWhole(sourceCanvas, targetCtx, size){
+    const temp = document.createElement("canvas");
+    temp.width = Math.floor(sourceCanvas.width / size);
+    temp.height = Math.floor(sourceCanvas.height / size);
 
-    tempCanvas.width = Math.max(1, Math.floor(sourceCanvas.width / pixelSize));
-    tempCanvas.height = Math.max(1, Math.floor(sourceCanvas.height / pixelSize));
+    const tctx = temp.getContext("2d");
+    tctx.drawImage(sourceCanvas, 0, 0, temp.width, temp.height);
 
-    tempCtx.drawImage(
-        sourceCanvas,
-        0,
-        0,
-        tempCanvas.width,
-        tempCanvas.height
-    );
-
-    targetCtx.clearRect(0, 0, targetCtx.canvas.width, targetCtx.canvas.height);
-
+    targetCtx.clearRect(0,0,targetCtx.canvas.width,targetCtx.canvas.height);
     targetCtx.imageSmoothingEnabled = false;
 
     targetCtx.drawImage(
-        tempCanvas,
+        temp,
         0,
         0,
         targetCtx.canvas.width,
@@ -188,18 +169,8 @@ function generateImages(){
 
     drawNormal(ctx1);
 
-    const pixelSize = parseInt(
-        document.getElementById("pixelSize").value
-    );
-
-    // пікселізується ВСЯ картинка разом з текстом
-    pixelateWhole(ctx1.canvas, ctx2, pixelSize);
-
-    document.getElementById("download1").href =
-        ctx1.canvas.toDataURL();
-
-    document.getElementById("download2").href =
-        ctx2.canvas.toDataURL();
+    const pixel = parseInt(document.getElementById("pixelSize").value);
+    pixelateWhole(ctx1.canvas, ctx2, pixel);
 }
 </script>
 
