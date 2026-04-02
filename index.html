@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motivation Image Maker Pro</title>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    max-width: 950px;
+    margin: 20px auto;
+    padding: 20px;
+}
+canvas{
+    border: 1px solid #ccc;
+    max-width: 100%;
+    margin: 10px 0;
+}
+.controls{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+input, button{
+    padding: 10px;
+    font-size: 16px;
+}
+label{
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<h1>Генератор мотиваційних фото</h1>
+
+<div class="controls">
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="textInput" placeholder="Введи текст зверху">
+    
+    <label>Розмір пікселів: <span id="pixelValue">20</span></label>
+    <input type="range" id="pixelSize" min="5" max="80" value="20">
+    
+    <button onclick="generateImages()">Згенерувати</button>
+</div>
+
+<h2>Звичайне фото</h2>
+<canvas id="canvas1" width="1080" height="1080"></canvas>
+<br>
+<a id="download1" download="normal.png">Скачати</a>
+
+<h2>Повністю пікселізоване фото</h2>
+<canvas id="canvas2" width="1080" height="1080"></canvas>
+<br>
+<a id="download2" download="pixelated.png">Скачати</a>
+
+<script>
+let uploadedImage = null;
+
+document.getElementById("imageInput").addEventListener("change", e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+        uploadedImage = new Image();
+        uploadedImage.src = ev.target.result;
+    };
+
+    reader.readAsDataURL(file);
+});
+
+document.getElementById("pixelSize").addEventListener("input", e => {
+    document.getElementById("pixelValue").textContent = e.target.value;
+});
+
+function splitToTwoLines(ctx, text, maxWidth){
+    let fontSize = 110;
+    let lines = [];
+
+    while(fontSize >= 40){
+        ctx.font = `bold px Arial`;
+        const words = text.toUpperCase().split(" ");
+        lines = [];
+        let line = "";
+
+        for(let word of words){
+            let testLine = line + word + " ";
+
+            if(ctx.measureText(testLine).width > maxWidth && line !== ""){
+                lines.push(line.trim());
+                line = word + " ";
+            } else {
+                line = testLine;
+            }
+        }
+
+        lines.push(line.trim());
+
+        if(lines.length <= 2){
+            return { lines, fontSize };
+        }
+
+        fontSize -= 5;
+    }
+
+    return {
+        lines: [lines[0] || "", lines.slice(1).join(" ")],
+        fontSize: 40
+    };
+}
+
+function drawNormal(ctx){
+    const canvas = ctx.canvas;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const text = document.getElementById("textInput").value || "";
+
+    const result = splitToTwoLines(ctx, text, canvas.width - 80);
+    const lines = result.lines;
+    const fontSize = result.fontSize;
+
+    ctx.font = `bold px Arial`;
+    ctx.fillStyle = "black";
+    ctx.textAlign = "center";
+
+    const lineHeight = fontSize + 10;
+    const topHeight = lines.length * lineHeight + 60;
+
+    lines.forEach((line, index) => {
+        ctx.fillText(
+            line,
+            canvas.width / 2,
+            50 + fontSize + index * lineHeight
+        );
+    });
+
+    if(uploadedImage){
+        const remainingHeight = canvas.height - topHeight;
+
+        // розтягує фото рівно під текст
+        ctx.drawImage(
+            uploadedImage,
+            0,
+            topHeight,
+            canvas.width,
+            remainingHeight
+        );
+    }
+}
+
+function pixelateWhole(sourceCanvas, targetCtx, pixelSize){
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d");
+
+    tempCanvas.width = Math.max(1, Math.floor(sourceCanvas.width / pixelSize));
+    tempCanvas.height = Math.max(1, Math.floor(sourceCanvas.height / pixelSize));
+
+    tempCtx.drawImage(
+        sourceCanvas,
+        0,
+        0,
+        tempCanvas.width,
+        tempCanvas.height
+    );
+
+    targetCtx.clearRect(0, 0, targetCtx.canvas.width, targetCtx.canvas.height);
+
+    targetCtx.imageSmoothingEnabled = false;
+
+    targetCtx.drawImage(
+        tempCanvas,
+        0,
+        0,
+        targetCtx.canvas.width,
+        targetCtx.canvas.height
+    );
+
+    targetCtx.imageSmoothingEnabled = true;
+}
+
+function generateImages(){
+    const ctx1 = document.getElementById("canvas1").getContext("2d");
+    const ctx2 = document.getElementById("canvas2").getContext("2d");
+
+    drawNormal(ctx1);
+
+    const pixelSize = parseInt(
+        document.getElementById("pixelSize").value
+    );
+
+    // пікселізується ВСЯ картинка разом з текстом
+    pixelateWhole(ctx1.canvas, ctx2, pixelSize);
+
+    document.getElementById("download1").href =
+        ctx1.canvas.toDataURL();
+
+    document.getElementById("download2").href =
+        ctx2.canvas.toDataURL();
+}
+</script>
+
+</body>
+</html>
