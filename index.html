@@ -7,67 +7,119 @@
 <style>
 body{
     font-family: Arial, sans-serif;
-    max-width: 950px;
+    max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
+    line-height: 1.4;
 }
-canvas{
-    border: 1px solid #ccc;
-    max-width: 100%;
-    margin: 10px 0;
+h1,h2{
+    margin-bottom: 10px;
+}
+.section{
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
 .controls{
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
-input, button{
-    padding: 10px;
+label{
+    font-size: 14px;
+}
+input[type="text"]{
+    padding: 12px;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+input[type="range"]{
+    width: 100%;
+}
+button{
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.download-btn{
+    margin-top: 8px;
+}
+canvas{
+    border: 1px solid #ddd;
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
 }
 </style>
 </head>
 <body>
 
-<h1>Генератор фото</h1>
+<h1>Генератор TikTok фото 🔥</h1>
 
+<div class="section">
 <div class="controls">
     <input type="file" id="imageInput" accept="image/*">
-    <input type="text" id="textInput" placeholder="Введи текст">
 
-    <label>Ширина тексту (X): <span id="textWidthValue">1000</span></label>
+    <input type="text" id="textInput" placeholder="Верхній текст">
+    <input type="text" id="bottomTextInput" placeholder="Нижній текст">
+
+    <label>
+        Ширина верхнього тексту:
+        <span id="textWidthValue">1000</span>
+    </label>
     <input type="range" id="textWidth" min="300" max="1080" value="1000">
 
-    <label>Розмір тексту (Y): <span id="fontSizeValue">110</span></label>
+    <label>
+        Розмір верхнього тексту:
+        <span id="fontSizeValue">110</span>
+    </label>
     <input type="range" id="fontSize" min="40" max="200" value="110">
 
-    <label>Пікселізація: <span id="pixelValue">20</span></label>
-    <input type="range" id="pixelSize" min="5" max="80" value="20">
+    <label>
+        Розмір нижнього тексту:
+        <span id="bottomFontSizeValue">80</span>
+    </label>
+    <input type="range" id="bottomFontSize" min="30" max="150" value="80">
 
-    <button onclick="generateImages()">Згенерувати</button>
+    <label>
+        Пікселізація:
+        <span id="pixelValue">20</span>
+    </label>
+    <input type="range" id="pixelSize" min="5" max="80" value="20">
+</div>
 </div>
 
-<h2>Перше фото</h2>
+<div class="section">
+<h2>Звичайне фото</h2>
 <canvas id="canvas1" width="1080" height="1080"></canvas>
 <br>
 <a id="download1" download="normal.png">
-    <button>Скачати перше фото</button>
+    <button class="download-btn">Скачати перше фото</button>
 </a>
+</div>
 
+<div class="section">
 <h2>Піксельне фото</h2>
 <canvas id="canvas2" width="1080" height="1080"></canvas>
 <br>
 <a id="download2" download="pixelated.png">
-    <button>Скачати піксельне фото</button>
+    <button class="download-btn">Скачати піксельне фото</button>
 </a>
+</div>
 
 <script>
 let uploadedImage = null;
 
 const controls = [
     "textInput",
+    "bottomTextInput",
     "textWidth",
     "fontSize",
+    "bottomFontSize",
     "pixelSize"
 ];
 
@@ -97,6 +149,9 @@ function updateLabels(){
 
     document.getElementById("fontSizeValue").textContent =
         document.getElementById("fontSize").value;
+
+    document.getElementById("bottomFontSizeValue").textContent =
+        document.getElementById("bottomFontSize").value;
 
     document.getElementById("pixelValue").textContent =
         document.getElementById("pixelSize").value;
@@ -131,13 +186,21 @@ function drawNormal(ctx){
     const canvas = ctx.canvas;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
     ctx.fillStyle = "white";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
     const text = document.getElementById("textInput").value;
-    const maxWidth = parseInt(document.getElementById("textWidth").value);
-    const fontSize = parseInt(document.getElementById("fontSize").value);
+    const bottomText =
+        document.getElementById("bottomTextInput").value.toUpperCase();
+
+    const maxWidth =
+        parseInt(document.getElementById("textWidth").value);
+
+    const fontSize =
+        parseInt(document.getElementById("fontSize").value);
+
+    const bottomFontSize =
+        parseInt(document.getElementById("bottomFontSize").value);
 
     ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = "black";
@@ -149,8 +212,9 @@ function drawNormal(ctx){
     const lineHeight = fontSize + 10;
     const whiteAreaHeight = lines.length * lineHeight + 100;
 
-    // текст по центру білого поля
-    const startY = whiteAreaHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
+    const startY =
+        whiteAreaHeight / 2 -
+        ((lines.length - 1) * lineHeight) / 2;
 
     lines.forEach((line, i)=>{
         ctx.fillText(
@@ -167,6 +231,27 @@ function drawNormal(ctx){
             whiteAreaHeight,
             canvas.width,
             canvas.height - whiteAreaHeight
+        );
+    }
+
+    if(bottomText){
+        ctx.font = `bold ${bottomFontSize}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "black";
+        ctx.strokeText(
+            bottomText,
+            canvas.width / 2,
+            canvas.height - 80
+        );
+
+        ctx.fillStyle = "white";
+        ctx.fillText(
+            bottomText,
+            canvas.width / 2,
+            canvas.height - 80
         );
     }
 }
@@ -208,14 +293,16 @@ function pixelateWhole(sourceCanvas, targetCtx, size){
 }
 
 function generateImages(){
-    const ctx1 = document.getElementById("canvas1").getContext("2d");
-    const ctx2 = document.getElementById("canvas2").getContext("2d");
+    const ctx1 =
+        document.getElementById("canvas1").getContext("2d");
+
+    const ctx2 =
+        document.getElementById("canvas2").getContext("2d");
 
     drawNormal(ctx1);
 
-    const pixel = parseInt(
-        document.getElementById("pixelSize").value
-    );
+    const pixel =
+        parseInt(document.getElementById("pixelSize").value);
 
     pixelateWhole(ctx1.canvas, ctx2, pixel);
 
