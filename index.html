@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Motivation Image Maker Pro</title>
+<title>Photo Editor TikTok Style</title>
 <style>
 body{
     font-family: Arial, sans-serif;
@@ -24,6 +24,9 @@ canvas{
 input, button{
     padding: 10px;
     font-size: 16px;
+}
+a button{
+    margin-bottom: 20px;
 }
 </style>
 </head>
@@ -48,9 +51,20 @@ input, button{
 </div>
 
 <br>
+
+<h2>Перше фото</h2>
 <canvas id="canvas1" width="1080" height="1080"></canvas>
 <br>
+<a id="download1" download="normal.png">
+    <button>Скачати перше фото</button>
+</a>
+
+<h2>Піксельне фото</h2>
 <canvas id="canvas2" width="1080" height="1080"></canvas>
+<br>
+<a id="download2" download="pixelated.png">
+    <button>Скачати піксельне фото</button>
+</a>
 
 <script>
 let uploadedImage = null;
@@ -67,15 +81,15 @@ document.getElementById("imageInput").addEventListener("change", e => {
     reader.readAsDataURL(file);
 });
 
-function updateValue(sliderId, valueId){
+function updateSlider(sliderId, valueId){
     document.getElementById(sliderId).addEventListener("input", e=>{
         document.getElementById(valueId).textContent = e.target.value;
     });
 }
 
-updateValue("textWidth", "textWidthValue");
-updateValue("fontSize", "fontSizeValue");
-updateValue("pixelSize", "pixelValue");
+updateSlider("textWidth", "textWidthValue");
+updateSlider("fontSize", "fontSizeValue");
+updateSlider("pixelSize", "pixelValue");
 
 function wrapText(ctx, text, maxWidth){
     const words = text.toUpperCase().split(" ");
@@ -106,6 +120,7 @@ function drawNormal(ctx){
     const canvas = ctx.canvas;
 
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
     ctx.fillStyle = "white";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
@@ -143,13 +158,27 @@ function drawNormal(ctx){
 
 function pixelateWhole(sourceCanvas, targetCtx, size){
     const temp = document.createElement("canvas");
+
     temp.width = Math.floor(sourceCanvas.width / size);
     temp.height = Math.floor(sourceCanvas.height / size);
 
     const tctx = temp.getContext("2d");
-    tctx.drawImage(sourceCanvas, 0, 0, temp.width, temp.height);
 
-    targetCtx.clearRect(0,0,targetCtx.canvas.width,targetCtx.canvas.height);
+    tctx.drawImage(
+        sourceCanvas,
+        0,
+        0,
+        temp.width,
+        temp.height
+    );
+
+    targetCtx.clearRect(
+        0,
+        0,
+        targetCtx.canvas.width,
+        targetCtx.canvas.height
+    );
+
     targetCtx.imageSmoothingEnabled = false;
 
     targetCtx.drawImage(
@@ -169,8 +198,17 @@ function generateImages(){
 
     drawNormal(ctx1);
 
-    const pixel = parseInt(document.getElementById("pixelSize").value);
+    const pixel = parseInt(
+        document.getElementById("pixelSize").value
+    );
+
     pixelateWhole(ctx1.canvas, ctx2, pixel);
+
+    document.getElementById("download1").href =
+        ctx1.canvas.toDataURL("image/png");
+
+    document.getElementById("download2").href =
+        ctx2.canvas.toDataURL("image/png");
 }
 </script>
 
