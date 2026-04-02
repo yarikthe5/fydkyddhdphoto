@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo Editor TikTok Style</title>
+<title>Photo Editor Live</title>
 <style>
 body{
     font-family: Arial, sans-serif;
@@ -24,9 +24,6 @@ canvas{
 input, button{
     padding: 10px;
     font-size: 16px;
-}
-a button{
-    margin-bottom: 20px;
 }
 </style>
 </head>
@@ -50,8 +47,6 @@ a button{
     <button onclick="generateImages()">Згенерувати</button>
 </div>
 
-<br>
-
 <h2>Перше фото</h2>
 <canvas id="canvas1" width="1080" height="1080"></canvas>
 <br>
@@ -69,27 +64,43 @@ a button{
 <script>
 let uploadedImage = null;
 
-document.getElementById("imageInput").addEventListener("change", e => {
+const controls = [
+    "textInput",
+    "textWidth",
+    "fontSize",
+    "pixelSize"
+];
+
+document.getElementById("imageInput").addEventListener("change", e=>{
     const file = e.target.files[0];
     const reader = new FileReader();
 
-    reader.onload = ev => {
+    reader.onload = ev=>{
         uploadedImage = new Image();
+        uploadedImage.onload = generateImages;
         uploadedImage.src = ev.target.result;
     };
 
     reader.readAsDataURL(file);
 });
 
-function updateSlider(sliderId, valueId){
-    document.getElementById(sliderId).addEventListener("input", e=>{
-        document.getElementById(valueId).textContent = e.target.value;
+controls.forEach(id=>{
+    document.getElementById(id).addEventListener("input", ()=>{
+        updateLabels();
+        generateImages();
     });
-}
+});
 
-updateSlider("textWidth", "textWidthValue");
-updateSlider("fontSize", "fontSizeValue");
-updateSlider("pixelSize", "pixelValue");
+function updateLabels(){
+    document.getElementById("textWidthValue").textContent =
+        document.getElementById("textWidth").value;
+
+    document.getElementById("fontSizeValue").textContent =
+        document.getElementById("fontSize").value;
+
+    document.getElementById("pixelValue").textContent =
+        document.getElementById("pixelSize").value;
+}
 
 function wrapText(ctx, text, maxWidth){
     const words = text.toUpperCase().split(" ");
@@ -97,7 +108,7 @@ function wrapText(ctx, text, maxWidth){
     let line = "";
 
     for(let word of words){
-        let test = line + word + " ";
+        const test = line + word + " ";
 
         if(ctx.measureText(test).width > maxWidth && line){
             lines.push(line.trim());
@@ -131,17 +142,21 @@ function drawNormal(ctx){
     ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
 
     const lines = wrapText(ctx, text, maxWidth);
 
     const lineHeight = fontSize + 10;
-    const topHeight = lines.length * lineHeight + 60;
+    const whiteAreaHeight = lines.length * lineHeight + 100;
+
+    // текст по центру білого поля
+    const startY = whiteAreaHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
 
     lines.forEach((line, i)=>{
         ctx.fillText(
             line,
             canvas.width / 2,
-            50 + fontSize + i * lineHeight
+            startY + i * lineHeight
         );
     });
 
@@ -149,9 +164,9 @@ function drawNormal(ctx){
         ctx.drawImage(
             uploadedImage,
             0,
-            topHeight,
+            whiteAreaHeight,
             canvas.width,
-            canvas.height - topHeight
+            canvas.height - whiteAreaHeight
         );
     }
 }
@@ -210,6 +225,9 @@ function generateImages(){
     document.getElementById("download2").href =
         ctx2.canvas.toDataURL("image/png");
 }
+
+updateLabels();
+generateImages();
 </script>
 
 </body>
