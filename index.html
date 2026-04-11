@@ -3,116 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo Editor</title>
+<title>Photo Editor Live</title>
 <style>
 body{
     font-family: Arial, sans-serif;
     max-width: 1000px;
-    margin: 0 auto;
-    padding: 16px;
-    background: #fafafa;
+    margin: 20px auto;
+    padding: 20px;
+    line-height: 1.4;
 }
 h1,h2{
-    margin: 8px 0;
+    margin-bottom: 10px;
 }
 .section{
-    background: white;
+    background: #f5f5f5;
     padding: 16px;
-    border-radius: 14px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
 .controls{
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: white;
-    padding: 16px;
-    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
-input[type="text"],
-input[type="file"]{
-    width: 100%;
-    box-sizing: border-box;
+label{
+    font-size: 14px;
+}
+input[type="text"]{
     padding: 12px;
-    margin-bottom: 12px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
 }
 input[type="range"]{
     width: 100%;
-    margin-bottom: 14px;
 }
 button{
-    width: 100%;
-    padding: 14px;
+    padding: 12px;
     font-size: 16px;
     border: none;
-    border-radius: 10px;
-    background: #111;
-    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.download-btn{
     margin-top: 8px;
 }
 canvas{
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
     border: 1px solid #ddd;
-}
-.open-buttons{
-    display:flex;
-    gap:10px;
-    margin-top:10px;
-}
-.open-buttons button{
-    flex:1;
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
 }
 </style>
 </head>
 <body>
 
-<h1>Редактор фото 🔥</h1>
+<h1>Генератор TikTok фото 🔥</h1>
 
-<div class="section controls">
+<div class="section">
+<div class="controls">
     <input type="file" id="imageInput" accept="image/*">
+
     <input type="text" id="textInput" placeholder="Верхній текст">
     <input type="text" id="bottomTextInput" placeholder="Нижній текст">
 
-    <label>Ширина верхнього тексту:
+    <label>
+        Ширина верхнього тексту:
         <span id="textWidthValue">1000</span>
     </label>
     <input type="range" id="textWidth" min="300" max="1080" value="1000">
 
-    <label>Розмір верхнього тексту:
+    <label>
+        Розмір верхнього тексту:
         <span id="fontSizeValue">110</span>
     </label>
     <input type="range" id="fontSize" min="40" max="200" value="110">
 
-    <label>Розмір нижнього тексту:
+    <label>
+        Розмір нижнього тексту:
         <span id="bottomFontSizeValue">80</span>
     </label>
     <input type="range" id="bottomFontSize" min="30" max="150" value="80">
 
-    <label>Пікселізація:
+    <label>
+        Пікселізація:
         <span id="pixelValue">20</span>
     </label>
     <input type="range" id="pixelSize" min="5" max="80" value="20">
 </div>
-
-<div class="section">
-    <h2>Перше фото</h2>
-    <canvas id="canvas1" width="1080" height="1080"></canvas>
 </div>
 
 <div class="section">
-    <h2>Піксельне фото</h2>
-    <canvas id="canvas2" width="1080" height="1080"></canvas>
+<h2>Звичайне фото</h2>
+<canvas id="canvas1" width="1080" height="1080"></canvas>
+<br>
+<a id="download1" download="normal.png">
+    <button class="download-btn">Скачати перше фото</button>
+</a>
+</div>
 
-    <div class="open-buttons">
-        <button onclick="openImage('canvas1')">Відкрити 1 фото</button>
-        <button onclick="openImage('canvas2')">Відкрити 2 фото</button>
-    </div>
+<div class="section">
+<h2>Піксельне фото</h2>
+<canvas id="canvas2" width="1080" height="1080"></canvas>
+<br>
+<a id="download2" download="pixelated.png">
+    <button class="download-btn">Скачати піксельне фото</button>
+</a>
 </div>
 
 <script>
@@ -193,9 +189,7 @@ function drawNormal(ctx){
     ctx.fillStyle = "white";
     ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    const topText =
-        document.getElementById("textInput").value;
-
+    const text = document.getElementById("textInput").value;
     const bottomText =
         document.getElementById("bottomTextInput").value.toUpperCase();
 
@@ -213,7 +207,7 @@ function drawNormal(ctx){
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    const lines = wrapText(ctx, topText, maxWidth);
+    const lines = wrapText(ctx, text, maxWidth);
 
     const lineHeight = fontSize + 10;
     const whiteAreaHeight = lines.length * lineHeight + 100;
@@ -242,10 +236,11 @@ function drawNormal(ctx){
 
     if(bottomText){
         ctx.font = `bold ${bottomFontSize}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
 
         ctx.lineWidth = 10;
         ctx.strokeStyle = "black";
-
         ctx.strokeText(
             bottomText,
             canvas.width / 2,
@@ -253,7 +248,6 @@ function drawNormal(ctx){
         );
 
         ctx.fillStyle = "white";
-
         ctx.fillText(
             bottomText,
             canvas.width / 2,
@@ -311,38 +305,12 @@ function generateImages(){
         parseInt(document.getElementById("pixelSize").value);
 
     pixelateWhole(ctx1.canvas, ctx2, pixel);
-}
 
-function openImage(canvasId){
-    const canvas = document.getElementById(canvasId);
-    const imageUrl = canvas.toDataURL("image/png");
+    document.getElementById("download1").href =
+        ctx1.canvas.toDataURL("image/png");
 
-    const newWindow = window.open();
-
-    newWindow.document.write(`
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body{
-                    margin:0;
-                    display:flex;
-                    justify-content:center;
-                    align-items:center;
-                    min-height:100vh;
-                    background:black;
-                }
-                img{
-                    max-width:100%;
-                    height:auto;
-                }
-            </style>
-        </head>
-        <body>
-            <img src="${imageUrl}">
-        </body>
-        </html>
-    `);
+    document.getElementById("download2").href =
+        ctx2.canvas.toDataURL("image/png");
 }
 
 updateLabels();
