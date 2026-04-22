@@ -136,7 +136,7 @@ document.querySelectorAll("input,select").forEach(el=>{
     el.addEventListener("input", render);
 });
 
-/* ===== WRAP TEXT (LINES FIX) ===== */
+/* wrap */
 function wrapText(ctx, text, maxLines){
     let words = text.split(" ");
     let lines = [""];
@@ -156,42 +156,48 @@ function wrapText(ctx, text, maxLines){
     return lines.slice(0, maxLines);
 }
 
-/* ===== RENDER ===== */
+/* render */
 function render(){
     ctx.clearRect(0,0,1080,1080);
 
     const topSize = +document.getElementById("topSize").value;
     const bottomSize = +document.getElementById("bottomSize").value;
-    const lines = +document.getElementById("lines").value;
+    const maxLines = +document.getElementById("lines").value;
 
     const topText = document.getElementById("topText").value.toUpperCase();
     const bottomText = document.getElementById("bottomText").value.toUpperCase();
 
-    /* TOP */
-    ctx.fillStyle = "white";
-    ctx.fillRect(0,0,1080,200);
-
-    ctx.font = `bold ${topSize}px Arial`;
     ctx.textAlign = "center";
+
+    /* BACKGROUND */
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,1080,1080);
+
+    /* TOP BLOCK ONLY */
+    ctx.font = `bold ${topSize}px Arial`;
     ctx.fillStyle = "black";
 
-    let wrapped = wrapText(ctx, topText, lines);
+    let linesArr = wrapText(ctx, topText, maxLines);
 
-    let y = 120;
-    for(let line of wrapped){
+    let startY = 120;
+    let lineHeight = topSize + 10;
+
+    let topBlockHeight = linesArr.length * lineHeight + 80;
+
+    let y = startY;
+    for(let line of linesArr){
         ctx.fillText(line,540,y);
-        y += topSize;
+        y += lineHeight;
     }
 
-    /* IMAGE */
+    /* IMAGE (FULL REMAIN SPACE) */
     if(loaded && img){
-        ctx.drawImage(img,0,200,1080,880);
+        ctx.drawImage(img,0,topBlockHeight,1080,1080-topBlockHeight);
     }
 
-    /* BOTTOM TEXT */
+    /* BOTTOM TEXT OVER IMAGE (NO BLOCK!) */
     if(bottomText){
         ctx.font = `bold ${bottomSize}px Arial`;
-        ctx.textAlign = "center";
 
         ctx.lineWidth = 8;
         ctx.strokeStyle = "black";
@@ -205,7 +211,7 @@ function render(){
     applyEffect();
 }
 
-/* EFFECTS */
+/* effects */
 function applyEffect(){
     const effect = document.getElementById("effect").value;
     const strength = +document.getElementById("strength").value;
@@ -239,7 +245,7 @@ function applyEffect(){
     document.getElementById("img2").src = c.toDataURL();
 }
 
-/* DOWNLOAD */
+/* download */
 function download(id){
     const a = document.createElement("a");
     a.href = document.getElementById(id).src;
