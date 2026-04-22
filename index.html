@@ -3,61 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Angel Editor</title>
+
+<title>Angel Core Editor</title>
 
 <style>
 body{
     margin:0;
-    font-family: "Arial";
-    background: linear-gradient(180deg,#ffffff,#f3f3f3);
-    color:#111;
+    font-family: -apple-system, Arial;
+    background: radial-gradient(circle at top,#ffffff,#eaeaf0);
+}
+
+/* glass cards */
+.card{
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.6);
+    border-radius:20px;
+    padding:16px;
+    margin:16px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.1);
 }
 
 .container{
-    max-width:1000px;
+    max-width:900px;
     margin:auto;
-    padding:16px;
 }
 
-.card{
-    background:white;
-    padding:16px;
-    border-radius:16px;
-    box-shadow:0 4px 20px rgba(0,0,0,0.08);
-    margin-bottom:16px;
-}
-
+/* inputs */
 input,select{
     width:100%;
     padding:10px;
+    border-radius:12px;
+    border:1px solid rgba(0,0,0,0.1);
+    background:rgba(255,255,255,0.7);
     margin:6px 0;
-    border-radius:10px;
-    border:1px solid #ddd;
 }
 
-label{
-    font-size:13px;
-}
-
-canvas{
+/* preview */
+.preview{
     width:100%;
-    border-radius:12px;
+    border-radius:16px;
     margin-top:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* важливо для айфона */
-img.export{
-    width:100%;
-    border-radius:12px;
-    margin-top:10px;
+/* glow title */
+h2{
+    text-align:center;
+    font-weight:600;
+    text-shadow:0 0 10px rgba(255,255,255,0.9);
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<h2>Angel Editor ✨</h2>
+<h2>Angel Core Editor ✨</h2>
 
 <div class="card">
 
@@ -66,7 +68,7 @@ img.export{
 <input type="text" id="topText" placeholder="Верхній текст">
 <input type="text" id="bottomText" placeholder="Нижній текст">
 
-<label>Кількість рядків</label>
+<label>Рядки</label>
 <input type="range" id="lines" min="1" max="4" value="2">
 
 <label>Шрифт</label>
@@ -74,7 +76,6 @@ img.export{
 <option>Arial</option>
 <option>Impact</option>
 <option>Georgia</option>
-<option>Courier New</option>
 </select>
 
 <label>Колір тексту</label>
@@ -83,7 +84,7 @@ img.export{
 <label>Обводка</label>
 <input type="color" id="strokeColor" value="#ffffff">
 
-<label>Товщина обводки</label>
+<label>Товщина</label>
 <input type="range" id="strokeWidth" min="0" max="20" value="6">
 
 <label>Ефект</label>
@@ -92,46 +93,53 @@ img.export{
 <option value="blur">Blur</option>
 </select>
 
-<label>Сила ефекту</label>
+<label>Сила</label>
 <input type="range" id="effectStrength" min="2" max="50" value="10">
 
 </div>
 
 <div class="card">
-<canvas id="canvas" width="1080" height="1080"></canvas>
+<h3>Оригінал</h3>
+<img id="img1" class="preview">
 
-<!-- тут img для айфона -->
-<img id="resultImage" class="export">
+<h3>З ефектом</h3>
+<img id="img2" class="preview">
 </div>
 
 </div>
 
 <script>
-let img = null;
+let baseCanvas = document.createElement("canvas");
+baseCanvas.width = 1080;
+baseCanvas.height = 1080;
 
-document.getElementById("imageInput").onchange = e=>{
-    const reader = new FileReader();
-    reader.onload = ev=>{
-        img = new Image();
-        img.onload = render;
-        img.src = ev.target.result;
+let ctx = baseCanvas.getContext("2d");
+
+let img=null;
+
+document.getElementById("imageInput").onchange=e=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+        img=new Image();
+        img.onload=render;
+        img.src=ev.target.result;
     };
     reader.readAsDataURL(e.target.files[0]);
 };
 
 document.querySelectorAll("input,select").forEach(el=>{
-    el.oninput = render;
+    el.oninput=render;
 });
 
-function splitLines(ctx,text,maxLines){
-    let words = text.split(" ");
-    let lines = [""];
+function wrap(ctx,text,maxLines){
+    let words=text.split(" ");
+    let lines=[""];
 
     words.forEach(word=>{
-        let last = lines[lines.length-1];
-        lines[lines.length-1] = last + " " + word;
+        let last=lines[lines.length-1];
+        lines[lines.length-1]=last+" "+word;
 
-        if(lines.length < maxLines && ctx.measureText(lines[lines.length-1]).width > 800){
+        if(lines.length<maxLines && ctx.measureText(lines[lines.length-1]).width>800){
             lines.push(word);
         }
     });
@@ -140,30 +148,25 @@ function splitLines(ctx,text,maxLines){
 }
 
 function render(){
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
     ctx.clearRect(0,0,1080,1080);
+
     ctx.fillStyle="white";
     ctx.fillRect(0,0,1080,1080);
 
-    const font = document.getElementById("font").value;
-    const size = 100;
-    ctx.font = `bold ${size}px ${font}`;
-
-    const linesCount = parseInt(document.getElementById("lines").value);
-    const topText = document.getElementById("topText").value.toUpperCase();
-
-    let lines = splitLines(ctx,topText,linesCount);
-
-    let y = 100;
-
+    const font=document.getElementById("font").value;
+    ctx.font=`bold 100px ${font}`;
     ctx.textAlign="center";
 
-    lines.forEach(line=>{
-        ctx.strokeStyle=document.getElementById("strokeColor").value;
-        ctx.lineWidth=document.getElementById("strokeWidth").value;
+    let lines=wrap(ctx,
+        document.getElementById("topText").value.toUpperCase(),
+        document.getElementById("lines").value
+    );
 
+    let y=100;
+
+    lines.forEach(line=>{
+        ctx.lineWidth=document.getElementById("strokeWidth").value;
+        ctx.strokeStyle=document.getElementById("strokeColor").value;
         ctx.strokeText(line,540,y);
 
         ctx.fillStyle=document.getElementById("color").value;
@@ -176,44 +179,51 @@ function render(){
         ctx.drawImage(img,0,y,1080,1080-y);
     }
 
-    const bottom = document.getElementById("bottomText").value.toUpperCase();
+    const bottom=document.getElementById("bottomText").value.toUpperCase();
 
     if(bottom){
         ctx.font=`bold 80px ${font}`;
-
         ctx.strokeText(bottom,540,1000);
         ctx.fillText(bottom,540,1000);
     }
 
-    applyEffect(ctx);
+    // 👉 перше фото
+    document.getElementById("img1").src = baseCanvas.toDataURL();
 
-    // 👉 генеруємо img (для айфона)
-    document.getElementById("resultImage").src = canvas.toDataURL();
+    // 👉 друге фото з ефектом
+    applyEffect();
 }
 
-function applyEffect(ctx){
-    const effect = document.getElementById("effect").value;
-    const strength = parseInt(document.getElementById("effectStrength").value);
+function applyEffect(){
+    const canvas=document.createElement("canvas");
+    canvas.width=1080;
+    canvas.height=1080;
 
-    const canvas = ctx.canvas;
+    const c=canvas.getContext("2d");
+    c.drawImage(baseCanvas,0,0);
+
+    const effect=document.getElementById("effect").value;
+    const strength=document.getElementById("effectStrength").value;
 
     if(effect==="pixel"){
-        const temp = document.createElement("canvas");
-        temp.width = canvas.width/strength;
-        temp.height = canvas.height/strength;
+        let temp=document.createElement("canvas");
+        temp.width=canvas.width/strength;
+        temp.height=canvas.height/strength;
 
-        const t = temp.getContext("2d");
+        let t=temp.getContext("2d");
         t.drawImage(canvas,0,0,temp.width,temp.height);
 
-        ctx.imageSmoothingEnabled=false;
-        ctx.drawImage(temp,0,0,canvas.width,canvas.height);
+        c.imageSmoothingEnabled=false;
+        c.drawImage(temp,0,0,canvas.width,canvas.height);
     }
 
     if(effect==="blur"){
-        ctx.filter = `blur(${strength}px)`;
-        ctx.drawImage(canvas,0,0);
-        ctx.filter="none";
+        c.filter=`blur(${strength}px)`;
+        c.drawImage(canvas,0,0);
+        c.filter="none";
     }
+
+    document.getElementById("img2").src = canvas.toDataURL();
 }
 
 render();
