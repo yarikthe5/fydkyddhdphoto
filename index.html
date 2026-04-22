@@ -3,10 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Editor</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
 
 <style>
 body{
@@ -16,9 +13,9 @@ body{
 }
 
 .wrap{
-    padding:12px;
     max-width:500px;
     margin:auto;
+    padding:12px;
 }
 
 .block{
@@ -31,14 +28,10 @@ body{
 input,select{
     width:100%;
     padding:14px;
-    margin:8px 0;
+    margin:6px 0;
     font-size:16px;
     border-radius:10px;
     border:1px solid #ddd;
-}
-
-label{
-    font-size:14px;
 }
 
 img{
@@ -51,11 +44,11 @@ button{
     width:100%;
     padding:14px;
     margin-top:10px;
-    font-size:16px;
     border:none;
     border-radius:10px;
     background:black;
     color:white;
+    font-size:16px;
 }
 </style>
 </head>
@@ -70,18 +63,13 @@ button{
 <input type="text" id="topText" placeholder="Верхній текст">
 <input type="text" id="bottomText" placeholder="Нижній текст">
 
-<label>Шрифт</label>
-<select id="font">
-<option>Arial</option>
-<option>Impact</option>
-<option>Montserrat</option>
-<option>Oswald</option>
-</select>
+<label>Розмір верхнього тексту</label>
+<input type="range" id="topSize" min="40" max="140" value="90">
 
-<label>Розмір тексту</label>
-<input type="range" id="fontSize" min="40" max="140" value="90">
+<label>Розмір нижнього тексту</label>
+<input type="range" id="bottomSize" min="30" max="120" value="70">
 
-<label>Рядки</label>
+<label>Кількість рядків</label>
 <input type="range" id="lines" min="1" max="3" value="2">
 
 <label>Ефект</label>
@@ -91,51 +79,51 @@ button{
 <option value="blur">Blur</option>
 </select>
 
-<label>Сила</label>
-<input type="range" id="effectStrength" min="2" max="30" value="8">
+<label>Сила ефекту</label>
+<input type="range" id="strength" min="2" max="30" value="8">
 </div>
 
 <div class="block">
 <h3>Фото</h3>
 <img id="img1">
-<button onclick="downloadImage('img1')">Зберегти</button>
+<button onclick="download('img1')">Зберегти</button>
 
 <h3>Фото з ефектом</h3>
 <img id="img2">
-<button onclick="downloadImage('img2')">Зберегти</button>
+<button onclick="download('img2')">Зберегти</button>
 </div>
 
 </div>
 
 <script>
-let baseCanvas = document.createElement("canvas");
-baseCanvas.width = 1080;
-baseCanvas.height = 1080;
-let ctx = baseCanvas.getContext("2d");
-
 let img = null;
-let timeout;
 
-function update(){
-    clearTimeout(timeout);
-    timeout = setTimeout(render, 40);
-}
+const canvas = document.createElement("canvas");
+canvas.width = 1080;
+canvas.height = 1080;
+const ctx = canvas.getContext("2d");
 
+/* завантаження */
 document.getElementById("imageInput").onchange = e=>{
+    const file = e.target.files[0];
     const reader = new FileReader();
+
     reader.onload = ev=>{
         img = new Image();
         img.onload = render;
         img.src = ev.target.result;
     };
-    reader.readAsDataURL(e.target.files[0]);
+
+    reader.readAsDataURL(file);
 };
 
+/* обновлення */
 document.querySelectorAll("input,select").forEach(el=>{
-    el.oninput = update;
+    el.oninput = render;
 });
 
-function wrap(ctx,text,maxLines){
+/* перенос тексту */
+function wrapText(ctx,text,maxLines){
     let words = text.split(" ");
     let lines = [""];
     
@@ -157,13 +145,16 @@ function render(){
     ctx.fillStyle="white";
     ctx.fillRect(0,0,1080,1080);
 
-    const font = document.getElementById("font").value;
-    const size = document.getElementById("fontSize").value;
+    const topSize = document.getElementById("topSize").value;
+    const bottomSize = document.getElementById("bottomSize").value;
 
-    ctx.font = `bold ${size}px ${font}`;
     ctx.textAlign="center";
 
-    let lines = wrap(ctx,
+    /* верхній текст */
+    ctx.font = `bold ${topSize}px Arial`;
+
+    let lines = wrapText(
+        ctx,
         document.getElementById("topText").value.toUpperCase(),
         document.getElementById("lines").value
     );
@@ -173,65 +164,71 @@ function render(){
     lines.forEach(line=>{
         ctx.fillStyle="black";
         ctx.fillText(line,540,y);
-        y += size + 10;
+        y += topSize + 10;
     });
 
+    /* фото */
     if(img){
         ctx.drawImage(img,0,y,1080,1080-y);
     }
 
+    /* нижній текст */
     const bottom = document.getElementById("bottomText").value.toUpperCase();
 
     if(bottom){
-        ctx.font = `bold ${size-20}px ${font}`;
+        ctx.font = `bold ${bottomSize}px Arial`;
         ctx.fillText(bottom,540,1000);
     }
 
-    document.getElementById("img1").src = baseCanvas.toDataURL();
+    /* 1 фото */
+    document.getElementById("img1").src = canvas.toDataURL();
 
+    /* 2 фото */
     applyEffect();
 }
 
 function applyEffect(){
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = 1080;
-
-    const c = canvas.getContext("2d");
-
     const effect = document.getElementById("effect").value;
-    const strength = document.getElementById("effectStrength").value;
+    const strength = document.getElementById("strength").value;
+
+    const c = document.createElement("canvas");
+    c.width = 1080;
+    c.height = 1080;
+
+    const cx = c.getContext("2d");
 
     if(effect === "blur"){
-        c.filter = `blur(${strength}px)`;
-        c.drawImage(baseCanvas,0,0);
-        c.filter = "none";
+        cx.filter = `blur(${strength}px)`;
+        cx.drawImage(canvas,0,0);
+        cx.filter = "none";
     } else {
-        c.drawImage(baseCanvas,0,0);
+        cx.drawImage(canvas,0,0);
     }
 
     if(effect === "pixel"){
         let temp = document.createElement("canvas");
-        temp.width = canvas.width / strength;
-        temp.height = canvas.height / strength;
+        temp.width = c.width / strength;
+        temp.height = c.height / strength;
 
         let t = temp.getContext("2d");
-        t.drawImage(canvas,0,0,temp.width,temp.height);
+        t.drawImage(c,0,0,temp.width,temp.height);
 
-        c.imageSmoothingEnabled = false;
-        c.drawImage(temp,0,0,canvas.width,canvas.height);
+        cx.imageSmoothingEnabled = false;
+        cx.drawImage(temp,0,0,c.width,c.height);
     }
 
-    document.getElementById("img2").src = canvas.toDataURL();
+    document.getElementById("img2").src = c.toDataURL();
 }
 
-function downloadImage(id){
-    const link = document.createElement("a");
-    link.href = document.getElementById(id).src;
-    link.download = "image.png";
-    link.click();
+/* скачування */
+function download(id){
+    const a = document.createElement("a");
+    a.href = document.getElementById(id).src;
+    a.download = "image.png";
+    a.click();
 }
 
+/* старт */
 render();
 </script>
 
