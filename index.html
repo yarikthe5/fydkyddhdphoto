@@ -3,350 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Photo Editor</title>
+
+<!-- нормальні шрифти -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+
 <style>
 body{
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 16px;
-    background: #fafafa;
+    margin:0;
+    font-family: Arial;
+    background:#f2f2f2;
 }
-h1,h2{
-    margin: 8px 0;
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:12px;
 }
-.section{
-    background: white;
-    padding: 16px;
-    border-radius: 14px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+.card{
+    background:white;
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:12px;
 }
-.controls{
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: white;
-    padding: 16px;
-    border-radius: 14px;
+
+input,select,button{
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    font-size:16px;
+    border-radius:10px;
+    border:1px solid #ddd;
 }
-input[type="text"],
-input[type="file"]{
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    margin-bottom: 12px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-}
-input[type="range"]{
-    width: 100%;
-    margin-bottom: 14px;
-}
+
 button{
-    width: 100%;
-    padding: 14px;
-    font-size: 16px;
-    border: none;
-    border-radius: 10px;
-    background: #111;
-    color: white;
-    margin-top: 8px;
+    background:black;
+    color:white;
 }
+
 canvas{
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}
-.open-buttons{
-    display:flex;
-    gap:10px;
+    width:100%;
+    border-radius:10px;
     margin-top:10px;
 }
-.open-buttons button{
-    flex:1;
+
+img{
+    width:100%;
+    border-radius:10px;
+    margin-top:10px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>Редактор фото 🔥</h1>
+<div class="container">
 
-<div class="section controls">
-    <input type="file" id="imageInput" accept="image/*">
-    <input type="text" id="textInput" placeholder="Верхній текст">
-    <input type="text" id="bottomTextInput" placeholder="Нижній текст">
+<div class="card">
 
-    <label>Ширина верхнього тексту:
-        <span id="textWidthValue">1000</span>
-    </label>
-    <input type="range" id="textWidth" min="300" max="1080" value="1000">
+<input type="file" id="imageInput">
 
-    <label>Розмір верхнього тексту:
-        <span id="fontSizeValue">110</span>
-    </label>
-    <input type="range" id="fontSize" min="40" max="200" value="110">
+<input type="text" id="topText" placeholder="Верхній текст">
+<input type="text" id="bottomText" placeholder="Нижній текст">
 
-    <label>Розмір нижнього тексту:
-        <span id="bottomFontSizeValue">80</span>
-    </label>
-    <input type="range" id="bottomFontSize" min="30" max="150" value="80">
+<label>Шрифт</label>
+<select id="font">
+<option value="Arial">Arial</option>
+<option value="Impact">Impact</option>
+<option value="Montserrat">Montserrat</option>
+<option value="Oswald">Oswald</option>
+</select>
 
-    <label>Пікселізація:
-        <span id="pixelValue">20</span>
-    </label>
-    <input type="range" id="pixelSize" min="5" max="80" value="20">
+<label>Розмір тексту</label>
+<input type="range" id="fontSize" min="40" max="150" value="90">
+
+<label>Кількість рядків</label>
+<input type="range" id="lines" min="1" max="3" value="2">
+
+<label>Ефект</label>
+<select id="effect">
+<option value="none">Без ефекту</option>
+<option value="pixel">Pixel</option>
+<option value="blur">Blur</option>
+</select>
+
+<label>Сила ефекту</label>
+<input type="range" id="effectStrength" min="2" max="40" value="10">
+
 </div>
 
-<div class="section">
-    <h2>Перше фото</h2>
-    <canvas id="canvas1" width="1080" height="1080"></canvas>
+<div class="card">
+<h3>Фото 1</h3>
+<img id="img1">
+
+<button onclick="downloadImage('img1')">Зберегти фото 1</button>
+
+<h3>Фото 2 (з ефектом)</h3>
+<img id="img2">
+
+<button onclick="downloadImage('img2')">Зберегти фото 2</button>
 </div>
 
-<div class="section">
-    <h2>Піксельне фото</h2>
-    <canvas id="canvas2" width="1080" height="1080"></canvas>
-
-    <div class="open-buttons">
-        <button onclick="openImage('canvas1')">Відкрити 1 фото</button>
-        <button onclick="openImage('canvas2')">Відкрити 2 фото</button>
-    </div>
 </div>
 
 <script>
-let uploadedImage = null;
+let baseCanvas = document.createElement("canvas");
+baseCanvas.width = 1080;
+baseCanvas.height = 1080;
 
-const controls = [
-    "textInput",
-    "bottomTextInput",
-    "textWidth",
-    "fontSize",
-    "bottomFontSize",
-    "pixelSize"
-];
+let ctx = baseCanvas.getContext("2d");
 
-document.getElementById("imageInput").addEventListener("change", e=>{
-    const file = e.target.files[0];
+let img = null;
+
+document.getElementById("imageInput").onchange = e=>{
     const reader = new FileReader();
-
     reader.onload = ev=>{
-        uploadedImage = new Image();
-        uploadedImage.onload = generateImages;
-        uploadedImage.src = ev.target.result;
+        img = new Image();
+        img.onload = render;
+        img.src = ev.target.result;
     };
+    reader.readAsDataURL(e.target.files[0]);
+};
 
-    reader.readAsDataURL(file);
+document.querySelectorAll("input,select").forEach(el=>{
+    el.oninput = render;
 });
 
-controls.forEach(id=>{
-    document.getElementById(id).addEventListener("input", ()=>{
-        updateLabels();
-        generateImages();
-    });
-});
+function wrap(ctx,text,maxLines){
+    let words = text.split(" ");
+    let lines = [""];
+    
+    words.forEach(word=>{
+        let last = lines[lines.length-1];
+        lines[lines.length-1] = last + " " + word;
 
-function updateLabels(){
-    document.getElementById("textWidthValue").textContent =
-        document.getElementById("textWidth").value;
-
-    document.getElementById("fontSizeValue").textContent =
-        document.getElementById("fontSize").value;
-
-    document.getElementById("bottomFontSizeValue").textContent =
-        document.getElementById("bottomFontSize").value;
-
-    document.getElementById("pixelValue").textContent =
-        document.getElementById("pixelSize").value;
-}
-
-function wrapText(ctx, text, maxWidth){
-    const words = text.toUpperCase().split(" ");
-    let lines = [];
-    let line = "";
-
-    for(let word of words){
-        const test = line + word + " ";
-
-        if(ctx.measureText(test).width > maxWidth && line){
-            lines.push(line.trim());
-            line = word + " ";
-        } else {
-            line = test;
+        if(lines.length < maxLines && ctx.measureText(lines[lines.length-1]).width > 900){
+            lines.push(word);
         }
-    }
-
-    lines.push(line.trim());
-
-    if(lines.length > 2){
-        lines = [lines[0], lines.slice(1).join(" ")];
-    }
-
-    return lines;
-}
-
-function drawNormal(ctx){
-    const canvas = ctx.canvas;
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    const topText =
-        document.getElementById("textInput").value;
-
-    const bottomText =
-        document.getElementById("bottomTextInput").value.toUpperCase();
-
-    const maxWidth =
-        parseInt(document.getElementById("textWidth").value);
-
-    const fontSize =
-        parseInt(document.getElementById("fontSize").value);
-
-    const bottomFontSize =
-        parseInt(document.getElementById("bottomFontSize").value);
-
-    ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillStyle = "black";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const lines = wrapText(ctx, topText, maxWidth);
-
-    const lineHeight = fontSize + 10;
-    const whiteAreaHeight = lines.length * lineHeight + 100;
-
-    const startY =
-        whiteAreaHeight / 2 -
-        ((lines.length - 1) * lineHeight) / 2;
-
-    lines.forEach((line, i)=>{
-        ctx.fillText(
-            line,
-            canvas.width / 2,
-            startY + i * lineHeight
-        );
     });
 
-    if(uploadedImage){
-        ctx.drawImage(
-            uploadedImage,
-            0,
-            whiteAreaHeight,
-            canvas.width,
-            canvas.height - whiteAreaHeight
-        );
+    return lines.slice(0,maxLines);
+}
+
+function render(){
+    ctx.clearRect(0,0,1080,1080);
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,1080,1080);
+
+    const font = document.getElementById("font").value;
+    const size = document.getElementById("fontSize").value;
+
+    ctx.font = `bold ${size}px ${font}`;
+    ctx.textAlign = "center";
+
+    let lines = wrap(ctx,
+        document.getElementById("topText").value.toUpperCase(),
+        document.getElementById("lines").value
+    );
+
+    let y = 100;
+
+    lines.forEach(line=>{
+        ctx.fillStyle = "black";
+        ctx.fillText(line,540,y);
+        y += size + 10;
+    });
+
+    if(img){
+        ctx.drawImage(img,0,y,1080,1080-y);
     }
 
-    if(bottomText){
-        ctx.font = `bold ${bottomFontSize}px Arial`;
+    const bottom = document.getElementById("bottomText").value.toUpperCase();
 
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = "black";
-
-        ctx.strokeText(
-            bottomText,
-            canvas.width / 2,
-            canvas.height - 80
-        );
-
-        ctx.fillStyle = "white";
-
-        ctx.fillText(
-            bottomText,
-            canvas.width / 2,
-            canvas.height - 80
-        );
+    if(bottom){
+        ctx.font = `bold ${size-20}px ${font}`;
+        ctx.fillText(bottom,540,1000);
     }
+
+    document.getElementById("img1").src = baseCanvas.toDataURL();
+
+    applyEffect();
 }
 
-function pixelateWhole(sourceCanvas, targetCtx, size){
-    const temp = document.createElement("canvas");
+function applyEffect(){
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1080;
 
-    temp.width = Math.floor(sourceCanvas.width / size);
-    temp.height = Math.floor(sourceCanvas.height / size);
+    const c = canvas.getContext("2d");
+    c.drawImage(baseCanvas,0,0);
 
-    const tctx = temp.getContext("2d");
+    const effect = document.getElementById("effect").value;
+    const strength = document.getElementById("effectStrength").value;
 
-    tctx.drawImage(
-        sourceCanvas,
-        0,
-        0,
-        temp.width,
-        temp.height
-    );
+    if(effect === "pixel"){
+        let temp = document.createElement("canvas");
+        temp.width = canvas.width / strength;
+        temp.height = canvas.height / strength;
 
-    targetCtx.clearRect(
-        0,
-        0,
-        targetCtx.canvas.width,
-        targetCtx.canvas.height
-    );
+        let t = temp.getContext("2d");
+        t.drawImage(canvas,0,0,temp.width,temp.height);
 
-    targetCtx.imageSmoothingEnabled = false;
+        c.imageSmoothingEnabled = false;
+        c.drawImage(temp,0,0,canvas.width,canvas.height);
+    }
 
-    targetCtx.drawImage(
-        temp,
-        0,
-        0,
-        targetCtx.canvas.width,
-        targetCtx.canvas.height
-    );
+    if(effect === "blur"){
+        c.filter = `blur(${strength}px)`;
+        c.drawImage(canvas,0,0);
+        c.filter = "none";
+    }
 
-    targetCtx.imageSmoothingEnabled = true;
+    document.getElementById("img2").src = canvas.toDataURL();
 }
 
-function generateImages(){
-    const ctx1 =
-        document.getElementById("canvas1").getContext("2d");
-
-    const ctx2 =
-        document.getElementById("canvas2").getContext("2d");
-
-    drawNormal(ctx1);
-
-    const pixel =
-        parseInt(document.getElementById("pixelSize").value);
-
-    pixelateWhole(ctx1.canvas, ctx2, pixel);
+function downloadImage(id){
+    const link = document.createElement("a");
+    link.href = document.getElementById(id).src;
+    link.download = "image.png";
+    link.click();
 }
 
-function openImage(canvasId){
-    const canvas = document.getElementById(canvasId);
-    const imageUrl = canvas.toDataURL("image/png");
-
-    const newWindow = window.open();
-
-    newWindow.document.write(`
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body{
-                    margin:0;
-                    display:flex;
-                    justify-content:center;
-                    align-items:center;
-                    min-height:100vh;
-                    background:black;
-                }
-                img{
-                    max-width:100%;
-                    height:auto;
-                }
-            </style>
-        </head>
-        <body>
-            <img src="${imageUrl}">
-        </body>
-        </html>
-    `);
-}
-
-updateLabels();
-generateImages();
+render();
 </script>
 
 </body>
