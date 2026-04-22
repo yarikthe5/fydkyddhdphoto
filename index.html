@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Photo Editor</title>
+<title>Editor</title>
 
-<!-- нормальні шрифти -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Oswald:wght@500&display=swap" rel="stylesheet">
 
 <style>
@@ -17,42 +16,54 @@ body{
 }
 
 .container{
-    max-width:900px;
+    max-width:1000px;
     margin:auto;
-    padding:12px;
+    padding:10px;
 }
 
-.card{
+/* компактний UI */
+.controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
     background:white;
-    padding:14px;
-    border-radius:12px;
-    margin-bottom:12px;
-}
-
-input,select,button{
-    width:100%;
-    padding:12px;
-    margin:6px 0;
-    font-size:16px;
+    padding:10px;
     border-radius:10px;
-    border:1px solid #ddd;
 }
 
-button{
-    background:black;
-    color:white;
+.controls input,
+.controls select{
+    padding:8px;
+    font-size:14px;
 }
 
-canvas{
-    width:100%;
-    border-radius:10px;
+/* фотки поруч */
+.images{
+    display:flex;
+    gap:10px;
     margin-top:10px;
+}
+
+.images div{
+    flex:1;
+    background:white;
+    padding:8px;
+    border-radius:10px;
 }
 
 img{
     width:100%;
-    border-radius:10px;
-    margin-top:10px;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border:none;
+    border-radius:8px;
+    background:black;
+    color:white;
 }
 </style>
 </head>
@@ -61,49 +72,44 @@ img{
 
 <div class="container">
 
-<div class="card">
-
+<div class="controls">
 <input type="file" id="imageInput">
 
 <input type="text" id="topText" placeholder="Верхній текст">
 <input type="text" id="bottomText" placeholder="Нижній текст">
 
-<label>Шрифт</label>
 <select id="font">
-<option value="Arial">Arial</option>
-<option value="Impact">Impact</option>
-<option value="Montserrat">Montserrat</option>
-<option value="Oswald">Oswald</option>
+<option>Arial</option>
+<option>Impact</option>
+<option>Montserrat</option>
+<option>Oswald</option>
 </select>
 
-<label>Розмір тексту</label>
-<input type="range" id="fontSize" min="40" max="150" value="90">
+<input type="range" id="fontSize" min="40" max="140" value="90">
 
-<label>Кількість рядків</label>
 <input type="range" id="lines" min="1" max="3" value="2">
 
-<label>Ефект</label>
 <select id="effect">
-<option value="none">Без ефекту</option>
+<option value="none">None</option>
 <option value="pixel">Pixel</option>
 <option value="blur">Blur</option>
 </select>
 
-<label>Сила ефекту</label>
-<input type="range" id="effectStrength" min="2" max="40" value="10">
-
+<input type="range" id="effectStrength" min="2" max="30" value="8">
 </div>
 
-<div class="card">
-<h3>Фото 1</h3>
+<div class="images">
+
+<div>
 <img id="img1">
+<button onclick="downloadImage('img1')">Зберегти</button>
+</div>
 
-<button onclick="downloadImage('img1')">Зберегти фото 1</button>
-
-<h3>Фото 2 (з ефектом)</h3>
+<div>
 <img id="img2">
+<button onclick="downloadImage('img2')">Зберегти</button>
+</div>
 
-<button onclick="downloadImage('img2')">Зберегти фото 2</button>
 </div>
 
 </div>
@@ -112,10 +118,16 @@ img{
 let baseCanvas = document.createElement("canvas");
 baseCanvas.width = 1080;
 baseCanvas.height = 1080;
-
 let ctx = baseCanvas.getContext("2d");
 
 let img = null;
+let timeout;
+
+/* debounce щоб не лагало */
+function update(){
+    clearTimeout(timeout);
+    timeout = setTimeout(render, 30);
+}
 
 document.getElementById("imageInput").onchange = e=>{
     const reader = new FileReader();
@@ -128,7 +140,7 @@ document.getElementById("imageInput").onchange = e=>{
 };
 
 document.querySelectorAll("input,select").forEach(el=>{
-    el.oninput = render;
+    el.oninput = update;
 });
 
 function wrap(ctx,text,maxLines){
@@ -150,14 +162,14 @@ function wrap(ctx,text,maxLines){
 function render(){
     ctx.clearRect(0,0,1080,1080);
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle="white";
     ctx.fillRect(0,0,1080,1080);
 
     const font = document.getElementById("font").value;
     const size = document.getElementById("fontSize").value;
 
     ctx.font = `bold ${size}px ${font}`;
-    ctx.textAlign = "center";
+    ctx.textAlign="center";
 
     let lines = wrap(ctx,
         document.getElementById("topText").value.toUpperCase(),
@@ -167,7 +179,7 @@ function render(){
     let y = 100;
 
     lines.forEach(line=>{
-        ctx.fillStyle = "black";
+        ctx.fillStyle="black";
         ctx.fillText(line,540,y);
         y += size + 10;
     });
@@ -194,10 +206,17 @@ function applyEffect(){
     canvas.height = 1080;
 
     const c = canvas.getContext("2d");
-    c.drawImage(baseCanvas,0,0);
 
     const effect = document.getElementById("effect").value;
     const strength = document.getElementById("effectStrength").value;
+
+    if(effect === "blur"){
+        c.filter = `blur(${strength}px)`;
+        c.drawImage(baseCanvas,0,0);
+        c.filter = "none";
+    } else {
+        c.drawImage(baseCanvas,0,0);
+    }
 
     if(effect === "pixel"){
         let temp = document.createElement("canvas");
@@ -209,12 +228,6 @@ function applyEffect(){
 
         c.imageSmoothingEnabled = false;
         c.drawImage(temp,0,0,canvas.width,canvas.height);
-    }
-
-    if(effect === "blur"){
-        c.filter = `blur(${strength}px)`;
-        c.drawImage(canvas,0,0);
-        c.filter = "none";
     }
 
     document.getElementById("img2").src = canvas.toDataURL();
