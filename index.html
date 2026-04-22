@@ -11,20 +11,17 @@ body{
     font-family: Arial;
     background:#f2f2f2;
 }
-
 .wrap{
     max-width:500px;
     margin:auto;
     padding:12px;
 }
-
 .block{
     background:white;
     padding:12px;
     border-radius:12px;
     margin-bottom:12px;
 }
-
 input,select{
     width:100%;
     padding:14px;
@@ -33,13 +30,11 @@ input,select{
     border-radius:10px;
     border:1px solid #ddd;
 }
-
 img{
     width:100%;
     border-radius:10px;
     margin-top:10px;
 }
-
 button{
     width:100%;
     padding:14px;
@@ -48,7 +43,6 @@ button{
     border-radius:10px;
     background:black;
     color:white;
-    font-size:16px;
 }
 </style>
 </head>
@@ -58,7 +52,7 @@ button{
 <div class="wrap">
 
 <div class="block">
-<input type="file" id="imageInput">
+<input type="file" id="imageInput" accept="image/*">
 
 <input type="text" id="topText" placeholder="Верхній текст">
 <input type="text" id="bottomText" placeholder="Нижній текст">
@@ -69,7 +63,7 @@ button{
 <label>Розмір нижнього тексту</label>
 <input type="range" id="bottomSize" min="30" max="120" value="70">
 
-<label>Кількість рядків</label>
+<label>Рядки</label>
 <input type="range" id="lines" min="1" max="3" value="2">
 
 <label>Ефект</label>
@@ -97,33 +91,35 @@ button{
 
 <script>
 let img = null;
+let loaded = false;
 
 const canvas = document.createElement("canvas");
 canvas.width = 1080;
 canvas.height = 1080;
 const ctx = canvas.getContext("2d");
 
-/* завантаження */
-document.getElementById("imageInput").onchange = e=>{
+/* загрузка фото */
+document.getElementById("imageInput").addEventListener("change", e=>{
     const file = e.target.files[0];
-    const reader = new FileReader();
+    if(!file) return;
 
-    reader.onload = ev=>{
-        img = new Image();
-        img.onload = render;
-        img.src = ev.target.result;
+    const url = URL.createObjectURL(file);
+
+    img = new Image();
+    img.onload = ()=>{
+        loaded = true;
+        render();
     };
-
-    reader.readAsDataURL(file);
-};
+    img.src = url;
+});
 
 /* обновлення */
 document.querySelectorAll("input,select").forEach(el=>{
-    el.oninput = render;
+    el.addEventListener("input", render);
 });
 
-/* перенос тексту */
-function wrapText(ctx,text,maxLines){
+/* перенос */
+function wrap(ctx,text,maxLines){
     let words = text.split(" ");
     let lines = [""];
     
@@ -153,7 +149,7 @@ function render(){
     /* верхній текст */
     ctx.font = `bold ${topSize}px Arial`;
 
-    let lines = wrapText(
+    let lines = wrap(
         ctx,
         document.getElementById("topText").value.toUpperCase(),
         document.getElementById("lines").value
@@ -168,7 +164,7 @@ function render(){
     });
 
     /* фото */
-    if(img){
+    if(loaded && img){
         ctx.drawImage(img,0,y,1080,1080-y);
     }
 
@@ -177,13 +173,17 @@ function render(){
 
     if(bottom){
         ctx.font = `bold ${bottomSize}px Arial`;
+
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = "black";
+        ctx.strokeText(bottom,540,1000);
+
+        ctx.fillStyle = "white";
         ctx.fillText(bottom,540,1000);
     }
 
-    /* 1 фото */
     document.getElementById("img1").src = canvas.toDataURL();
 
-    /* 2 фото */
     applyEffect();
 }
 
@@ -228,7 +228,6 @@ function download(id){
     a.click();
 }
 
-/* старт */
 render();
 </script>
 
