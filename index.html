@@ -3,318 +3,220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Photo Editor Live</title>
+<title>Angel Editor</title>
+
 <style>
 body{
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 20px;
-    line-height: 1.4;
+    margin:0;
+    font-family: "Arial";
+    background: linear-gradient(180deg,#ffffff,#f3f3f3);
+    color:#111;
 }
-h1,h2{
-    margin-bottom: 10px;
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:16px;
 }
-.section{
-    background: #f5f5f5;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+
+.card{
+    background:white;
+    padding:16px;
+    border-radius:16px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom:16px;
 }
-.controls{
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+
+input,select{
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border-radius:10px;
+    border:1px solid #ddd;
 }
+
 label{
-    font-size: 14px;
+    font-size:13px;
 }
-input[type="text"]{
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
-input[type="range"]{
-    width: 100%;
-}
-button{
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-.download-btn{
-    margin-top: 8px;
-}
+
 canvas{
-    border: 1px solid #ddd;
-    max-width: 100%;
-    border-radius: 10px;
-    margin-top: 10px;
+    width:100%;
+    border-radius:12px;
+    margin-top:10px;
+}
+
+/* важливо для айфона */
+img.export{
+    width:100%;
+    border-radius:12px;
+    margin-top:10px;
 }
 </style>
 </head>
+
 <body>
+<div class="container">
 
-<h1>Генератор TikTok фото 🔥</h1>
+<h2>Angel Editor ✨</h2>
 
-<div class="section">
-<div class="controls">
-    <input type="file" id="imageInput" accept="image/*">
+<div class="card">
 
-    <input type="text" id="textInput" placeholder="Верхній текст">
-    <input type="text" id="bottomTextInput" placeholder="Нижній текст">
+<input type="file" id="imageInput">
 
-    <label>
-        Ширина верхнього тексту:
-        <span id="textWidthValue">1000</span>
-    </label>
-    <input type="range" id="textWidth" min="300" max="1080" value="1000">
+<input type="text" id="topText" placeholder="Верхній текст">
+<input type="text" id="bottomText" placeholder="Нижній текст">
 
-    <label>
-        Розмір верхнього тексту:
-        <span id="fontSizeValue">110</span>
-    </label>
-    <input type="range" id="fontSize" min="40" max="200" value="110">
+<label>Кількість рядків</label>
+<input type="range" id="lines" min="1" max="4" value="2">
 
-    <label>
-        Розмір нижнього тексту:
-        <span id="bottomFontSizeValue">80</span>
-    </label>
-    <input type="range" id="bottomFontSize" min="30" max="150" value="80">
+<label>Шрифт</label>
+<select id="font">
+<option>Arial</option>
+<option>Impact</option>
+<option>Georgia</option>
+<option>Courier New</option>
+</select>
 
-    <label>
-        Пікселізація:
-        <span id="pixelValue">20</span>
-    </label>
-    <input type="range" id="pixelSize" min="5" max="80" value="20">
-</div>
-</div>
+<label>Колір тексту</label>
+<input type="color" id="color" value="#000000">
 
-<div class="section">
-<h2>Звичайне фото</h2>
-<canvas id="canvas1" width="1080" height="1080"></canvas>
-<br>
-<a id="download1" download="normal.png">
-    <button class="download-btn">Скачати перше фото</button>
-</a>
+<label>Обводка</label>
+<input type="color" id="strokeColor" value="#ffffff">
+
+<label>Товщина обводки</label>
+<input type="range" id="strokeWidth" min="0" max="20" value="6">
+
+<label>Ефект</label>
+<select id="effect">
+<option value="pixel">Pixel</option>
+<option value="blur">Blur</option>
+</select>
+
+<label>Сила ефекту</label>
+<input type="range" id="effectStrength" min="2" max="50" value="10">
+
 </div>
 
-<div class="section">
-<h2>Піксельне фото</h2>
-<canvas id="canvas2" width="1080" height="1080"></canvas>
-<br>
-<a id="download2" download="pixelated.png">
-    <button class="download-btn">Скачати піксельне фото</button>
-</a>
+<div class="card">
+<canvas id="canvas" width="1080" height="1080"></canvas>
+
+<!-- тут img для айфона -->
+<img id="resultImage" class="export">
+</div>
+
 </div>
 
 <script>
-let uploadedImage = null;
+let img = null;
 
-const controls = [
-    "textInput",
-    "bottomTextInput",
-    "textWidth",
-    "fontSize",
-    "bottomFontSize",
-    "pixelSize"
-];
-
-document.getElementById("imageInput").addEventListener("change", e=>{
-    const file = e.target.files[0];
+document.getElementById("imageInput").onchange = e=>{
     const reader = new FileReader();
-
     reader.onload = ev=>{
-        uploadedImage = new Image();
-        uploadedImage.onload = generateImages;
-        uploadedImage.src = ev.target.result;
+        img = new Image();
+        img.onload = render;
+        img.src = ev.target.result;
     };
+    reader.readAsDataURL(e.target.files[0]);
+};
 
-    reader.readAsDataURL(file);
+document.querySelectorAll("input,select").forEach(el=>{
+    el.oninput = render;
 });
 
-controls.forEach(id=>{
-    document.getElementById(id).addEventListener("input", ()=>{
-        updateLabels();
-        generateImages();
-    });
-});
+function splitLines(ctx,text,maxLines){
+    let words = text.split(" ");
+    let lines = [""];
 
-function updateLabels(){
-    document.getElementById("textWidthValue").textContent =
-        document.getElementById("textWidth").value;
+    words.forEach(word=>{
+        let last = lines[lines.length-1];
+        lines[lines.length-1] = last + " " + word;
 
-    document.getElementById("fontSizeValue").textContent =
-        document.getElementById("fontSize").value;
-
-    document.getElementById("bottomFontSizeValue").textContent =
-        document.getElementById("bottomFontSize").value;
-
-    document.getElementById("pixelValue").textContent =
-        document.getElementById("pixelSize").value;
-}
-
-function wrapText(ctx, text, maxWidth){
-    const words = text.toUpperCase().split(" ");
-    let lines = [];
-    let line = "";
-
-    for(let word of words){
-        const test = line + word + " ";
-
-        if(ctx.measureText(test).width > maxWidth && line){
-            lines.push(line.trim());
-            line = word + " ";
-        } else {
-            line = test;
+        if(lines.length < maxLines && ctx.measureText(lines[lines.length-1]).width > 800){
+            lines.push(word);
         }
-    }
+    });
 
-    lines.push(line.trim());
-
-    if(lines.length > 2){
-        lines = [lines[0], lines.slice(1).join(" ")];
-    }
-
-    return lines;
+    return lines.slice(0,maxLines);
 }
 
-function drawNormal(ctx){
+function render(){
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,1080,1080);
+    ctx.fillStyle="white";
+    ctx.fillRect(0,0,1080,1080);
+
+    const font = document.getElementById("font").value;
+    const size = 100;
+    ctx.font = `bold ${size}px ${font}`;
+
+    const linesCount = parseInt(document.getElementById("lines").value);
+    const topText = document.getElementById("topText").value.toUpperCase();
+
+    let lines = splitLines(ctx,topText,linesCount);
+
+    let y = 100;
+
+    ctx.textAlign="center";
+
+    lines.forEach(line=>{
+        ctx.strokeStyle=document.getElementById("strokeColor").value;
+        ctx.lineWidth=document.getElementById("strokeWidth").value;
+
+        ctx.strokeText(line,540,y);
+
+        ctx.fillStyle=document.getElementById("color").value;
+        ctx.fillText(line,540,y);
+
+        y+=110;
+    });
+
+    if(img){
+        ctx.drawImage(img,0,y,1080,1080-y);
+    }
+
+    const bottom = document.getElementById("bottomText").value.toUpperCase();
+
+    if(bottom){
+        ctx.font=`bold 80px ${font}`;
+
+        ctx.strokeText(bottom,540,1000);
+        ctx.fillText(bottom,540,1000);
+    }
+
+    applyEffect(ctx);
+
+    // 👉 генеруємо img (для айфона)
+    document.getElementById("resultImage").src = canvas.toDataURL();
+}
+
+function applyEffect(ctx){
+    const effect = document.getElementById("effect").value;
+    const strength = parseInt(document.getElementById("effectStrength").value);
+
     const canvas = ctx.canvas;
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "white";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    if(effect==="pixel"){
+        const temp = document.createElement("canvas");
+        temp.width = canvas.width/strength;
+        temp.height = canvas.height/strength;
 
-    const text = document.getElementById("textInput").value;
-    const bottomText =
-        document.getElementById("bottomTextInput").value.toUpperCase();
+        const t = temp.getContext("2d");
+        t.drawImage(canvas,0,0,temp.width,temp.height);
 
-    const maxWidth =
-        parseInt(document.getElementById("textWidth").value);
-
-    const fontSize =
-        parseInt(document.getElementById("fontSize").value);
-
-    const bottomFontSize =
-        parseInt(document.getElementById("bottomFontSize").value);
-
-    ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillStyle = "black";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const lines = wrapText(ctx, text, maxWidth);
-
-    const lineHeight = fontSize + 10;
-    const whiteAreaHeight = lines.length * lineHeight + 100;
-
-    const startY =
-        whiteAreaHeight / 2 -
-        ((lines.length - 1) * lineHeight) / 2;
-
-    lines.forEach((line, i)=>{
-        ctx.fillText(
-            line,
-            canvas.width / 2,
-            startY + i * lineHeight
-        );
-    });
-
-    if(uploadedImage){
-        ctx.drawImage(
-            uploadedImage,
-            0,
-            whiteAreaHeight,
-            canvas.width,
-            canvas.height - whiteAreaHeight
-        );
+        ctx.imageSmoothingEnabled=false;
+        ctx.drawImage(temp,0,0,canvas.width,canvas.height);
     }
 
-    if(bottomText){
-        ctx.font = `bold ${bottomFontSize}px Arial`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = "black";
-        ctx.strokeText(
-            bottomText,
-            canvas.width / 2,
-            canvas.height - 80
-        );
-
-        ctx.fillStyle = "white";
-        ctx.fillText(
-            bottomText,
-            canvas.width / 2,
-            canvas.height - 80
-        );
+    if(effect==="blur"){
+        ctx.filter = `blur(${strength}px)`;
+        ctx.drawImage(canvas,0,0);
+        ctx.filter="none";
     }
 }
 
-function pixelateWhole(sourceCanvas, targetCtx, size){
-    const temp = document.createElement("canvas");
-
-    temp.width = Math.floor(sourceCanvas.width / size);
-    temp.height = Math.floor(sourceCanvas.height / size);
-
-    const tctx = temp.getContext("2d");
-
-    tctx.drawImage(
-        sourceCanvas,
-        0,
-        0,
-        temp.width,
-        temp.height
-    );
-
-    targetCtx.clearRect(
-        0,
-        0,
-        targetCtx.canvas.width,
-        targetCtx.canvas.height
-    );
-
-    targetCtx.imageSmoothingEnabled = false;
-
-    targetCtx.drawImage(
-        temp,
-        0,
-        0,
-        targetCtx.canvas.width,
-        targetCtx.canvas.height
-    );
-
-    targetCtx.imageSmoothingEnabled = true;
-}
-
-function generateImages(){
-    const ctx1 =
-        document.getElementById("canvas1").getContext("2d");
-
-    const ctx2 =
-        document.getElementById("canvas2").getContext("2d");
-
-    drawNormal(ctx1);
-
-    const pixel =
-        parseInt(document.getElementById("pixelSize").value);
-
-    pixelateWhole(ctx1.canvas, ctx2, pixel);
-
-    document.getElementById("download1").href =
-        ctx1.canvas.toDataURL("image/png");
-
-    document.getElementById("download2").href =
-        ctx2.canvas.toDataURL("image/png");
-}
-
-updateLabels();
-generateImages();
+render();
 </script>
 
 </body>
