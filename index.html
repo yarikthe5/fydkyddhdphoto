@@ -8,20 +8,27 @@
 <style>
 body{
     margin:0;
-    font-family: Arial;
-    background:#f2f2f2;
+    font-family: Arial, sans-serif;
+    background:#f6f6f6;
+    color:#111;
 }
+
 .wrap{
-    max-width:500px;
+    max-width:520px;
     margin:auto;
     padding:12px;
 }
+
+/* прості картки */
 .block{
-    background:white;
+    background:#fff;
     padding:12px;
-    border-radius:12px;
-    margin-bottom:12px;
+    border-radius:14px;
+    margin-bottom:10px;
+    border:1px solid #e6e6e6;
 }
+
+/* інпути */
 input,select{
     width:100%;
     padding:14px;
@@ -29,20 +36,43 @@ input,select{
     font-size:16px;
     border-radius:10px;
     border:1px solid #ddd;
+    outline:none;
 }
-img{
-    width:100%;
-    border-radius:10px;
-    margin-top:10px;
-}
+
+/* кнопки */
 button{
     width:100%;
     padding:14px;
-    margin-top:10px;
+    margin-top:8px;
     border:none;
-    border-radius:10px;
-    background:black;
+    border-radius:12px;
+    background:#111;
     color:white;
+    font-size:16px;
+}
+
+/* картинки */
+img{
+    width:100%;
+    border-radius:12px;
+    margin-top:10px;
+}
+
+/* sticky export */
+.export-bar{
+    position:sticky;
+    bottom:0;
+    background:#fff;
+    padding:10px;
+    border-top:1px solid #ddd;
+    display:flex;
+    gap:10px;
+}
+
+/* заголовки */
+h3{
+    margin:6px 0;
+    font-size:16px;
 }
 </style>
 </head>
@@ -57,14 +87,11 @@ button{
 <input type="text" id="topText" placeholder="Верхній текст">
 <input type="text" id="bottomText" placeholder="Нижній текст">
 
-<label>Розмір верхнього тексту</label>
+<label>Верхній текст</label>
 <input type="range" id="topSize" min="40" max="140" value="90">
 
-<label>Розмір нижнього тексту</label>
+<label>Нижній текст</label>
 <input type="range" id="bottomSize" min="30" max="120" value="70">
-
-<label>Рядки</label>
-<input type="range" id="lines" min="1" max="3" value="2">
 
 <label>Ефект</label>
 <select id="effect">
@@ -73,18 +100,21 @@ button{
 <option value="blur">Blur</option>
 </select>
 
-<label>Сила ефекту</label>
+<label>Сила</label>
 <input type="range" id="strength" min="2" max="30" value="8">
 </div>
 
 <div class="block">
-<h3>Фото</h3>
+<h3>Оригінал</h3>
 <img id="img1">
-<button onclick="download('img1')">Зберегти</button>
 
-<h3>Фото з ефектом</h3>
+<h3>З ефектом</h3>
 <img id="img2">
-<button onclick="download('img2')">Зберегти</button>
+</div>
+
+<div class="export-bar">
+<button onclick="download('img1')">Оригінал</button>
+<button onclick="download('img2')">Ефект</button>
 </div>
 
 </div>
@@ -98,7 +128,7 @@ canvas.width = 1080;
 canvas.height = 1080;
 const ctx = canvas.getContext("2d");
 
-/* загрузка фото */
+/* upload */
 document.getElementById("imageInput").addEventListener("change", e=>{
     const file = e.target.files[0];
     if(!file) return;
@@ -113,83 +143,56 @@ document.getElementById("imageInput").addEventListener("change", e=>{
     img.src = url;
 });
 
-/* обновлення */
+/* live update */
 document.querySelectorAll("input,select").forEach(el=>{
     el.addEventListener("input", render);
 });
 
-/* перенос */
-function wrap(ctx,text,maxLines){
-    let words = text.split(" ");
-    let lines = [""];
-    
-    words.forEach(word=>{
-        let last = lines[lines.length-1];
-        lines[lines.length-1] = last + " " + word;
-
-        if(lines.length < maxLines && ctx.measureText(lines[lines.length-1]).width > 900){
-            lines.push(word);
-        }
-    });
-
-    return lines.slice(0,maxLines);
-}
-
+/* render */
 function render(){
     ctx.clearRect(0,0,1080,1080);
 
-    ctx.fillStyle="white";
-    ctx.fillRect(0,0,1080,1080);
+    const topSize = +document.getElementById("topSize").value;
+    const bottomSize = +document.getElementById("bottomSize").value;
 
-    const topSize = document.getElementById("topSize").value;
-    const bottomSize = document.getElementById("bottomSize").value;
+    const topText = document.getElementById("topText").value.toUpperCase();
+    const bottomText = document.getElementById("bottomText").value.toUpperCase();
 
-    ctx.textAlign="center";
+    /* top */
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,1080,200);
 
-    /* верхній текст */
     ctx.font = `bold ${topSize}px Arial`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "black";
+    ctx.fillText(topText,540,120);
 
-    let lines = wrap(
-        ctx,
-        document.getElementById("topText").value.toUpperCase(),
-        document.getElementById("lines").value
-    );
-
-    let y = 120;
-
-    lines.forEach(line=>{
-        ctx.fillStyle="black";
-        ctx.fillText(line,540,y);
-        y += topSize + 10;
-    });
-
-    /* фото */
+    /* image */
     if(loaded && img){
-        ctx.drawImage(img,0,y,1080,1080-y);
+        ctx.drawImage(img,0,200,1080,880);
     }
 
-    /* нижній текст */
-    const bottom = document.getElementById("bottomText").value.toUpperCase();
-
-    if(bottom){
+    /* bottom text */
+    if(bottomText){
         ctx.font = `bold ${bottomSize}px Arial`;
+        ctx.textAlign = "center";
 
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 8;
         ctx.strokeStyle = "black";
-        ctx.strokeText(bottom,540,1000);
+        ctx.strokeText(bottomText,540,1000);
 
         ctx.fillStyle = "white";
-        ctx.fillText(bottom,540,1000);
+        ctx.fillText(bottomText,540,1000);
     }
 
     document.getElementById("img1").src = canvas.toDataURL();
-
     applyEffect();
 }
 
+/* effects */
 function applyEffect(){
     const effect = document.getElementById("effect").value;
-    const strength = document.getElementById("strength").value;
+    const strength = +document.getElementById("strength").value;
 
     const c = document.createElement("canvas");
     c.width = 1080;
@@ -201,26 +204,26 @@ function applyEffect(){
         cx.filter = `blur(${strength}px)`;
         cx.drawImage(canvas,0,0);
         cx.filter = "none";
-    } else {
-        cx.drawImage(canvas,0,0);
     }
-
-    if(effect === "pixel"){
+    else if(effect === "pixel"){
         let temp = document.createElement("canvas");
-        temp.width = c.width / strength;
-        temp.height = c.height / strength;
+        temp.width = 1080 / strength;
+        temp.height = 1080 / strength;
 
         let t = temp.getContext("2d");
-        t.drawImage(c,0,0,temp.width,temp.height);
+        t.drawImage(canvas,0,0,temp.width,temp.height);
 
         cx.imageSmoothingEnabled = false;
-        cx.drawImage(temp,0,0,c.width,c.height);
+        cx.drawImage(temp,0,0,1080,1080);
+    }
+    else{
+        cx.drawImage(canvas,0,0);
     }
 
     document.getElementById("img2").src = c.toDataURL();
 }
 
-/* скачування */
+/* download */
 function download(id){
     const a = document.createElement("a");
     a.href = document.getElementById(id).src;
