@@ -3,63 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor</title>
+<title>Batch Image Generator</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family: Arial;
-    background:#f6f6f6;
+    font-family:Arial;
+    background:#f5f5f5;
 }
 
 .wrap{
-    max-width:520px;
+    max-width:600px;
     margin:auto;
     padding:12px;
 }
 
 .block{
-    background:#fff;
+    background:white;
     padding:12px;
-    border-radius:14px;
+    border-radius:12px;
     margin-bottom:10px;
-    border:1px solid #e6e6e6;
 }
 
-input,select{
+textarea, input{
     width:100%;
-    padding:14px;
-    margin:6px 0;
-    font-size:16px;
-    border-radius:10px;
-    border:1px solid #ddd;
+    padding:12px;
+    font-size:14px;
+    margin-top:8px;
 }
 
 button{
     width:100%;
     padding:14px;
-    margin-top:8px;
     border:none;
-    border-radius:12px;
-    background:#111;
+    border-radius:10px;
+    background:black;
     color:white;
-    font-size:16px;
+    margin-top:10px;
 }
 
 img{
     width:100%;
-    border-radius:12px;
+    border-radius:10px;
     margin-top:10px;
 }
 
-.export-bar{
-    position:sticky;
-    bottom:0;
-    background:#fff;
-    padding:10px;
-    border-top:1px solid #ddd;
-    display:flex;
-    gap:10px;
+#progress{
+    height:10px;
+    background:#ddd;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+#bar{
+    height:100%;
+    width:0%;
+    background:green;
 }
 </style>
 </head>
@@ -69,191 +70,149 @@ img{
 <div class="wrap">
 
 <div class="block">
-<input type="file" id="imageInput" accept="image/*">
-
-<input type="text" id="topText" placeholder="Верхній текст">
-<input type="text" id="bottomText" placeholder="Нижній текст">
-
-<label>Рядки (1–3)</label>
-<input type="range" id="lines" min="1" max="3" value="2">
-
-<label>Верхній текст</label>
-<input type="range" id="topSize" min="40" max="140" value="90">
-
-<label>Нижній текст</label>
-<input type="range" id="bottomSize" min="30" max="120" value="70">
-
-<label>Ефект</label>
-<select id="effect">
-<option value="none">Без</option>
-<option value="pixel">Pixel</option>
-<option value="blur">Blur</option>
-</select>
-
-<label>Сила</label>
-<input type="range" id="strength" min="2" max="30" value="8">
+<h3>Фото папка</h3>
+<input type="file" id="files" webkitdirectory multiple>
 </div>
 
 <div class="block">
-<h3>Оригінал</h3>
-<img id="img1">
-
-<h3>З ефектом</h3>
-<img id="img2">
+<h3>Тексти (через ///)</h3>
+<textarea id="texts" rows="6"></textarea>
 </div>
 
-<div class="export-bar">
-<button onclick="download('img1')">Оригінал</button>
-<button onclick="download('img2')">Ефект</button>
+<div class="block">
+<button onclick="start()">Створити ZIP</button>
+</div>
+
+<div class="block">
+<div id="progress"><div id="bar"></div></div>
 </div>
 
 </div>
 
 <script>
-let img = null;
-let loaded = false;
 
-const canvas = document.createElement("canvas");
-canvas.width = 1080;
-canvas.height = 1080;
-const ctx = canvas.getContext("2d");
+let files = [];
 
-document.getElementById("imageInput").addEventListener("change", e=>{
-    const file = e.target.files[0];
-    if(!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    img = new Image();
-    img.onload = ()=>{
-        loaded = true;
-        render();
-    };
-    img.src = url;
+document.getElementById("files").addEventListener("change", e=>{
+    files = Array.from(e.target.files);
 });
 
-document.querySelectorAll("input,select").forEach(el=>{
-    el.addEventListener("input", render);
-});
-
-/* wrap */
-function wrapText(ctx, text, maxLines){
+function wrapText(ctx,text,maxWidth,maxLines){
     let words = text.split(" ");
-    let lines = [""];
+    let lines=[""];
 
-    for(let word of words){
-        let test = lines[lines.length-1] + " " + word;
-
-        if(ctx.measureText(test).width > 900){
+    for(let w of words){
+        let test = lines[lines.length-1] + " " + w;
+        if(ctx.measureText(test).width > maxWidth){
             if(lines.length < maxLines){
-                lines.push(word);
+                lines.push(w);
             }
         } else {
-            lines[lines.length-1] = test;
+            lines[lines.length-1]=test;
         }
     }
-
-    return lines.slice(0, maxLines);
+    return lines.slice(0,maxLines);
 }
 
-/* render */
-function render(){
-    ctx.clearRect(0,0,1080,1080);
-
-    const topSize = +document.getElementById("topSize").value;
-    const bottomSize = +document.getElementById("bottomSize").value;
-    const maxLines = +document.getElementById("lines").value;
-
-    const topText = document.getElementById("topText").value.toUpperCase();
-    const bottomText = document.getElementById("bottomText").value.toUpperCase();
-
-    ctx.textAlign = "center";
-
-    /* BACKGROUND */
-    ctx.fillStyle = "white";
-    ctx.fillRect(0,0,1080,1080);
-
-    /* TOP BLOCK ONLY */
-    ctx.font = `bold ${topSize}px Arial`;
-    ctx.fillStyle = "black";
-
-    let linesArr = wrapText(ctx, topText, maxLines);
-
-    let startY = 120;
-    let lineHeight = topSize + 10;
-
-    let topBlockHeight = linesArr.length * lineHeight + 80;
-
-    let y = startY;
-    for(let line of linesArr){
-        ctx.fillText(line,540,y);
-        y += lineHeight;
+function fitFont(ctx,text){
+    let size = 120;
+    while(size>20){
+        ctx.font = `bold ${size}px Arial`;
+        if(ctx.measureText(text).width < 900) return size;
+        size--;
     }
-
-    /* IMAGE (FULL REMAIN SPACE) */
-    if(loaded && img){
-        ctx.drawImage(img,0,topBlockHeight,1080,1080-topBlockHeight);
-    }
-
-    /* BOTTOM TEXT OVER IMAGE (NO BLOCK!) */
-    if(bottomText){
-        ctx.font = `bold ${bottomSize}px Arial`;
-
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "black";
-        ctx.strokeText(bottomText,540,1000);
-
-        ctx.fillStyle = "white";
-        ctx.fillText(bottomText,540,1000);
-    }
-
-    document.getElementById("img1").src = canvas.toDataURL();
-    applyEffect();
+    return 20;
 }
 
-/* effects */
-function applyEffect(){
-    const effect = document.getElementById("effect").value;
-    const strength = +document.getElementById("strength").value;
+async function renderImage(file,text,idx){
+    return new Promise(res=>{
 
-    const c = document.createElement("canvas");
-    c.width = 1080;
-    c.height = 1080;
+        const img = new Image();
+        const url = URL.createObjectURL(file);
 
-    const cx = c.getContext("2d");
+        img.onload = ()=>{
 
-    if(effect === "blur"){
-        cx.filter = `blur(${strength}px)`;
-        cx.drawImage(canvas,0,0);
-        cx.filter = "none";
-    }
-    else if(effect === "pixel"){
-        let temp = document.createElement("canvas");
-        temp.width = 1080 / strength;
-        temp.height = 1080 / strength;
+            const c = document.createElement("canvas");
+            c.width=1080;
+            c.height=1080;
+            const ctx=c.getContext("2d");
 
-        let t = temp.getContext("2d");
-        t.drawImage(canvas,0,0,temp.width,temp.height);
+            ctx.fillStyle="white";
+            ctx.fillRect(0,0,1080,1080);
 
-        cx.imageSmoothingEnabled = false;
-        cx.drawImage(temp,0,0,1080,1080);
-    }
-    else{
-        cx.drawImage(canvas,0,0);
-    }
+            let fontSize = fitFont(ctx,text);
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle="black";
+            ctx.textAlign="center";
 
-    document.getElementById("img2").src = c.toDataURL();
+            let lines = wrapText(ctx,text,900,2);
+
+            let y=120;
+            let lineH = fontSize+10;
+
+            let topH = lines.length * lineH + 80;
+
+            lines.forEach(l=>{
+                ctx.fillText(l,540,y);
+                y+=lineH;
+            });
+
+            ctx.drawImage(img,0,topH,1080,1080-topH);
+
+            const normal = c.toDataURL("image/jpeg",0.95);
+
+            // BLUR VERSION
+            const c2 = document.createElement("canvas");
+            c2.width=1080;
+            c2.height=1080;
+            const cx = c2.getContext("2d");
+
+            cx.filter="blur(10px)";
+            cx.drawImage(c,0,0);
+
+            const blur = c2.toDataURL("image/jpeg",0.95);
+
+            res({normal,blur,idx});
+        };
+
+        img.src=url;
+    });
 }
 
-/* download */
-function download(id){
+async function start(){
+
+    const texts = document.getElementById("texts").value
+        .split("///")
+        .map(t=>t.trim())
+        .filter(t=>t);
+
+    const zip = new JSZip();
+
+    let bar = document.getElementById("bar");
+
+    for(let i=0;i<files.length;i++){
+
+        let t = texts[i] || "";
+
+        let r = await renderImage(files[i],t,i+1);
+
+        let n = r.normal.split(",")[1];
+        let b = r.blur.split(",")[1];
+
+        zip.file(`${i+1}.jpg`, n, {base64:true});
+        zip.file(`${i+1}pix.jpg`, b, {base64:true});
+
+        bar.style.width = ((i+1)/files.length*100)+"%";
+    }
+
+    const content = await zip.generateAsync({type:"blob"});
+
     const a = document.createElement("a");
-    a.href = document.getElementById(id).src;
-    a.download = "image.png";
+    a.href = URL.createObjectURL(content);
+    a.download = "images.zip";
     a.click();
 }
 
-render();
 </script>
 
 </body>
