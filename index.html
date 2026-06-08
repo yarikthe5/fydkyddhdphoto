@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Gallery 2-col</title>
+<title>Batch Gallery FIX</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
 
@@ -11,16 +11,11 @@ body{margin:0;font-family:Arial;background:#f5f5f5;padding:15px}
 
 .block{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px}
 
-.gallery{
-display:grid;
-grid-template-columns:1fr;
-gap:12px;
-}
-
 .row{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:10px;
+margin-bottom:12px;
 }
 
 .card{
@@ -29,13 +24,11 @@ padding:8px;
 border-radius:10px;
 }
 
-img{
-width:100%;
-border-radius:10px;
-}
+img{width:100%;border-radius:10px}
 
 .small{font-size:12px;color:#666}
-button,input,textarea,select{width:100%;padding:10px;margin-top:5px}
+
+input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
 </style>
 </head>
 
@@ -74,7 +67,7 @@ button,input,textarea,select{width:100%;padding:10px;margin-top:5px}
 
 <button onclick="generate()">🚀 Generate</button>
 
-<div class="gallery" id="gallery"></div>
+<div id="gallery"></div>
 
 <script>
 
@@ -84,23 +77,24 @@ document.getElementById("files").addEventListener("change",e=>{
     files=[...e.target.files];
 });
 
-function pixelate(canvas, ctx, factor){
+function pixelate(canvas,ctx,factor){
     const w=canvas.width,h=canvas.height;
 
-    let temp=document.createElement("canvas");
-    temp.width=Math.max(1,Math.floor(w/factor));
-    temp.height=Math.max(1,Math.floor(h/factor));
+    let small=document.createElement("canvas");
+    small.width=Math.max(1,Math.floor(w/factor));
+    small.height=Math.max(1,Math.floor(h/factor));
 
-    let tctx=temp.getContext("2d");
-    tctx.imageSmoothingEnabled=false;
-    tctx.drawImage(canvas,0,0,temp.width,temp.height);
+    let sctx=small.getContext("2d");
+
+    sctx.imageSmoothingEnabled=false;
+    sctx.drawImage(canvas,0,0,small.width,small.height);
 
     ctx.clearRect(0,0,w,h);
     ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(temp,0,0,temp.width,temp.height,0,0,w,h);
+    ctx.drawImage(small,0,0,small.width,small.height,0,0,w,h);
 }
 
-function render(file,text,font,pixel,wm){
+function renderBase(file,text,font,wm){
 
     return new Promise(res=>{
 
@@ -110,7 +104,8 @@ function render(file,text,font,pixel,wm){
         img.onload=()=>{
 
             let c=document.createElement("canvas");
-            c.width=1080;c.height=1080;
+            c.width=1080;
+            c.height=1080;
             let ctx=c.getContext("2d");
 
             ctx.fillStyle="#fff";
@@ -121,6 +116,7 @@ function render(file,text,font,pixel,wm){
             ctx.textAlign="center";
 
             let y=150;
+
             text.split(" ").forEach(t=>{
                 ctx.fillText(t,540,y);
                 y+=80;
@@ -134,13 +130,26 @@ function render(file,text,font,pixel,wm){
                 ctx.fillText(wm,540,1040);
             }
 
-            if(pixel>1){
-                pixelate(c,ctx,pixel);
-            }
-
-            res(c.toDataURL("image/jpeg",0.95));
+            res(c); // 🔥 чистий canvas
         };
     });
+}
+
+function makePixelCopy(base,pixel){
+
+    let c2=document.createElement("canvas");
+    c2.width=1080;
+    c2.height=1080;
+
+    let ctx2=c2.getContext("2d");
+
+    ctx2.drawImage(base,0,0);
+
+    if(pixel>1){
+        pixelate(c2,ctx2,pixel);
+    }
+
+    return c2;
 }
 
 async function generate(){
@@ -155,8 +164,10 @@ async function generate(){
 
     for(let i=0;i<files.length;i++){
 
-        let normal=await render(files[i],texts[i]||"",font,pixel,wm);
-        let pix=await render(files[i],texts[i]||"",font,pixel+6,wm);
+        let base=await renderBase(files[i],texts[i]||"",font,wm);
+
+        let normal=base.toDataURL("image/jpeg",0.95);
+        let pix=makePixelCopy(base,pixel).toDataURL("image/jpeg",0.95);
 
         let row=document.createElement("div");
         row.className="row";
