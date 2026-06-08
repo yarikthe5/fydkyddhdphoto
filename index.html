@@ -3,36 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batch Motivation Generator PRO</title>
+<title>Motivation Batch Generator PRO</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#f4f4f4;
-}
-
-.wrap{max-width:700px;margin:auto;padding:12px;}
+body{margin:0;font-family:Arial;background:#f5f5f5;}
+.wrap{max-width:720px;margin:auto;padding:12px;}
 .block{background:#fff;padding:12px;border-radius:12px;margin-bottom:10px;}
-
-textarea,input,select,button{
-    width:100%;
-    padding:12px;
-    margin-top:8px;
-    font-size:14px;
-}
-
-button{
-    background:black;
-    color:white;
-    border:none;
-    border-radius:10px;
-}
-
+textarea,input,select,button{width:100%;padding:12px;margin-top:8px;font-size:14px;}
+button{background:black;color:white;border:none;border-radius:10px;}
 .preview{border:1px solid #ddd;border-radius:10px;margin-top:8px;overflow:hidden;}
 canvas{width:100%;}
 .small{font-size:12px;color:#666;}
@@ -52,18 +34,17 @@ canvas{width:100%;}
 
 <div class="block">
 <h3>✍️ Тексти (///)</h3>
-<textarea id="texts">Ти можеш більше///
+<textarea id="texts">Ти сильніший ніж думаєш///
 Продовжуй навіть коли важко///
-Сильні не здаються</textarea>
+Успіх — це дисципліна</textarea>
 </div>
 
 <div class="block">
-<h3>🇺🇦 Мотиваційні шрифти</h3>
-
+<h3>🇺🇦 Шрифти</h3>
 <select id="font">
     <option value="Unbounded">Unbounded</option>
     <option value="Playfair Display">Playfair Display</option>
-    <option value="Cormorant Garamond">Cormorant</option>
+    <option value="Cormorant Garamond">Cormorant Garamond</option>
     <option value="Comfortaa">Comfortaa</option>
     <option value="Bad Script">Bad Script</option>
 </select>
@@ -78,7 +59,7 @@ canvas{width:100%;}
 <h3>🎨 Колір</h3>
 <input type="color" id="color" value="#000000">
 
-<h3>🧊 Пікселізація (ПРАЦЮЄ)</h3>
+<h3>🧊 Пікселізація</h3>
 <input type="range" id="pixel" min="1" max="30" value="1">
 <div class="small">1 = normal, 30 = strong pixel</div>
 </div>
@@ -90,9 +71,9 @@ canvas{width:100%;}
 
 <div class="block">
 <h3>👀 Preview</h3>
-<div class="preview"><canvas id="p1" width="540" height="540"></canvas></div>
-<div class="preview"><canvas id="p2" width="540" height="540"></canvas></div>
-<div class="preview"><canvas id="p3" width="540" height="540"></canvas></div>
+<canvas id="p1" width="540" height="540"></canvas>
+<canvas id="p2" width="540" height="540"></canvas>
+<canvas id="p3" width="540" height="540"></canvas>
 </div>
 
 <div class="block">
@@ -134,19 +115,23 @@ function wrap(ctx,text,w,maxLines){
     return lines;
 }
 
-function pixelate(ctx,canvas,scale){
-    let w=canvas.width;
-    let h=canvas.height;
+function pixelate(canvas, ctx, factor){
+    const w = canvas.width;
+    const h = canvas.height;
 
-    let temp=document.createElement("canvas");
-    temp.width=w;
-    temp.height=h;
-    let tctx=temp.getContext("2d");
+    let small = document.createElement("canvas");
+    small.width = Math.max(1, Math.floor(w / factor));
+    small.height = Math.max(1, Math.floor(h / factor));
 
-    tctx.drawImage(canvas,0,0,w/scale,h/scale);
+    let sctx = small.getContext("2d");
+
+    sctx.imageSmoothingEnabled = false;
+    sctx.drawImage(canvas, 0, 0, small.width, small.height);
+
     ctx.clearRect(0,0,w,h);
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(temp,0,0,w/scale,h/scale,0,0,w,h);
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(small, 0, 0, w, h);
 }
 
 function draw(canvas,text,fontType){
@@ -177,7 +162,7 @@ function draw(canvas,text,fontType){
 
     let px=parseInt(document.getElementById("pixel").value);
     if(px>1){
-        pixelate(ctx,canvas,px);
+        pixelate(canvas, ctx, px);
     }
 
     ctx.fillStyle="rgba(0,0,0,0.4)";
@@ -218,11 +203,11 @@ async function render(file,text,fontType){
 
             let lines=wrap(ctx,text,900,3);
 
-            let y=200;
+            let y=220;
 
             ctx.fillStyle=color;
             ctx.strokeStyle="black";
-            ctx.lineWidth=7;
+            ctx.lineWidth=6;
 
             lines.forEach(l=>{
                 ctx.strokeText(l,540,y);
@@ -230,12 +215,12 @@ async function render(file,text,fontType){
                 y+=size+15;
             });
 
+            ctx.drawImage(img,0,y,1080,1080-y);
+
             let px=parseInt(document.getElementById("pixel").value);
             if(px>1){
-                pixelate(ctx,c,px);
+                pixelate(c, ctx, px);
             }
-
-            ctx.drawImage(img,0,y,1080,1080-y);
 
             let normal=c.toDataURL("image/jpeg",0.95);
 
