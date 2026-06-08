@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batch Image Generator</title>
+<title>Batch Motivation Generator PRO</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -11,57 +13,31 @@
 body{
     margin:0;
     font-family:Arial;
-    background:#f5f5f5;
+    background:#f4f4f4;
 }
 
-.wrap{
-    max-width:600px;
-    margin:auto;
-    padding:12px;
-}
+.wrap{max-width:700px;margin:auto;padding:12px;}
+.block{background:#fff;padding:12px;border-radius:12px;margin-bottom:10px;}
 
-.block{
-    background:white;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:10px;
-}
-
-textarea, input{
+textarea,input,select,button{
     width:100%;
     padding:12px;
-    font-size:14px;
     margin-top:8px;
+    font-size:14px;
 }
 
 button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
     background:black;
     color:white;
-    margin-top:10px;
-}
-
-img{
-    width:100%;
+    border:none;
     border-radius:10px;
-    margin-top:10px;
 }
 
-#progress{
-    height:10px;
-    background:#ddd;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-#bar{
-    height:100%;
-    width:0%;
-    background:green;
-}
+.preview{border:1px solid #ddd;border-radius:10px;margin-top:8px;overflow:hidden;}
+canvas{width:100%;}
+.small{font-size:12px;color:#666;}
+#bar{height:10px;background:green;width:0%;}
+#progress{background:#ddd;border-radius:10px;overflow:hidden;}
 </style>
 </head>
 
@@ -70,148 +46,228 @@ img{
 <div class="wrap">
 
 <div class="block">
-<h3>Фото папка</h3>
+<h3>📁 Фото</h3>
 <input type="file" id="files" webkitdirectory multiple>
 </div>
 
 <div class="block">
-<h3>Тексти (через ///)</h3>
-<textarea id="texts" rows="6"></textarea>
+<h3>✍️ Тексти (///)</h3>
+<textarea id="texts">Ти можеш більше///
+Продовжуй навіть коли важко///
+Сильні не здаються</textarea>
 </div>
 
 <div class="block">
-<button onclick="start()">Створити ZIP</button>
+<h3>🇺🇦 Мотиваційні шрифти</h3>
+
+<select id="font">
+    <option value="Unbounded">Unbounded</option>
+    <option value="Playfair Display">Playfair Display</option>
+    <option value="Cormorant Garamond">Cormorant</option>
+    <option value="Comfortaa">Comfortaa</option>
+    <option value="Bad Script">Bad Script</option>
+</select>
+
+<h3>📏 Розмір</h3>
+<div style="display:flex;gap:8px;">
+<button onclick="changeSize(-5)">-</button>
+<input id="size" value="70">
+<button onclick="changeSize(5)">+</button>
+</div>
+
+<h3>🎨 Колір</h3>
+<input type="color" id="color" value="#000000">
+
+<h3>🧊 Пікселізація (ПРАЦЮЄ)</h3>
+<input type="range" id="pixel" min="1" max="30" value="1">
+<div class="small">1 = normal, 30 = strong pixel</div>
 </div>
 
 <div class="block">
+<h3>💧 Watermark</h3>
+<input id="wm" placeholder="@brand">
+</div>
+
+<div class="block">
+<h3>👀 Preview</h3>
+<div class="preview"><canvas id="p1" width="540" height="540"></canvas></div>
+<div class="preview"><canvas id="p2" width="540" height="540"></canvas></div>
+<div class="preview"><canvas id="p3" width="540" height="540"></canvas></div>
+</div>
+
+<div class="block">
+<button onclick="start()">🚀 Generate ZIP</button>
+</div>
+
 <div id="progress"><div id="bar"></div></div>
-</div>
 
 </div>
 
 <script>
 
-let files = [];
+let files=[];
 
-document.getElementById("files").addEventListener("change", e=>{
-    files = Array.from(e.target.files);
+document.getElementById("files").addEventListener("change",e=>{
+    files=[...e.target.files];
+    renderPreview();
 });
 
-function wrapText(ctx,text,maxWidth,maxLines){
-    let words = text.split(" ");
+function changeSize(v){
+    let el=document.getElementById("size");
+    el.value=Math.max(20,Math.min(160,parseInt(el.value)+v));
+    renderPreview();
+}
+
+function fontStyle(type,size){
+    return `${size}px "${type}", serif`;
+}
+
+function wrap(ctx,text,w,maxLines){
+    let words=text.split(" ");
     let lines=[""];
-
-    for(let w of words){
-        let test = lines[lines.length-1] + " " + w;
-        if(ctx.measureText(test).width > maxWidth){
-            if(lines.length < maxLines){
-                lines.push(w);
-            }
-        } else {
-            lines[lines.length-1]=test;
-        }
+    for(let w2 of words){
+        let t=lines[lines.length-1]+" "+w2;
+        if(ctx.measureText(t).width>w){
+            if(lines.length<maxLines) lines.push(w2);
+        }else lines[lines.length-1]=t;
     }
-    return lines.slice(0,maxLines);
+    return lines;
 }
 
-function fitFont(ctx,text){
-    let size = 120;
-    while(size>20){
-        ctx.font = `bold ${size}px Arial`;
-        if(ctx.measureText(text).width < 900) return size;
-        size--;
-    }
-    return 20;
+function pixelate(ctx,canvas,scale){
+    let w=canvas.width;
+    let h=canvas.height;
+
+    let temp=document.createElement("canvas");
+    temp.width=w;
+    temp.height=h;
+    let tctx=temp.getContext("2d");
+
+    tctx.drawImage(canvas,0,0,w/scale,h/scale);
+    ctx.clearRect(0,0,w,h);
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(temp,0,0,w/scale,h/scale,0,0,w,h);
 }
 
-async function renderImage(file,text,idx){
+function draw(canvas,text,fontType){
+    let ctx=canvas.getContext("2d");
+
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,540,540);
+
+    let size=parseInt(document.getElementById("size").value);
+    let color=document.getElementById("color").value;
+
+    ctx.font=fontStyle(fontType,size);
+    ctx.textAlign="center";
+
+    let lines=wrap(ctx,text,460,3);
+
+    let y=220;
+
+    ctx.fillStyle=color;
+    ctx.strokeStyle="rgba(0,0,0,0.7)";
+    ctx.lineWidth=5;
+
+    lines.forEach(l=>{
+        ctx.strokeText(l,270,y);
+        ctx.fillText(l,270,y);
+        y+=size+12;
+    });
+
+    let px=parseInt(document.getElementById("pixel").value);
+    if(px>1){
+        pixelate(ctx,canvas,px);
+    }
+
+    ctx.fillStyle="rgba(0,0,0,0.4)";
+    ctx.font="12px Arial";
+    ctx.fillText("PREVIEW",270,520);
+}
+
+function renderPreview(){
+    let t=document.getElementById("texts").value.split("///");
+
+    draw(p1,t[0]||"",font.value);
+    draw(p2,t[1]||"",font.value);
+    draw(p3,t[2]||"",font.value);
+}
+
+["texts","font","size","color","pixel"].forEach(id=>{
+    document.getElementById(id).addEventListener("input",renderPreview);
+});
+
+async function render(file,text,fontType){
     return new Promise(res=>{
+        let img=new Image();
+        img.src=URL.createObjectURL(file);
 
-        const img = new Image();
-        const url = URL.createObjectURL(file);
+        img.onload=()=>{
+            let c=document.createElement("canvas");
+            c.width=1080;c.height=1080;
+            let ctx=c.getContext("2d");
 
-        img.onload = ()=>{
-
-            const c = document.createElement("canvas");
-            c.width=1080;
-            c.height=1080;
-            const ctx=c.getContext("2d");
-
-            ctx.fillStyle="white";
+            ctx.fillStyle="#fff";
             ctx.fillRect(0,0,1080,1080);
 
-            let fontSize = fitFont(ctx,text);
-            ctx.font = `bold ${fontSize}px Arial`;
-            ctx.fillStyle="black";
+            let size=parseInt(document.getElementById("size").value);
+            let color=document.getElementById("color").value;
+
+            ctx.font=fontStyle(fontType,size);
             ctx.textAlign="center";
 
-            let lines = wrapText(ctx,text,900,2);
+            let lines=wrap(ctx,text,900,3);
 
-            let y=120;
-            let lineH = fontSize+10;
+            let y=200;
 
-            let topH = lines.length * lineH + 80;
+            ctx.fillStyle=color;
+            ctx.strokeStyle="black";
+            ctx.lineWidth=7;
 
             lines.forEach(l=>{
+                ctx.strokeText(l,540,y);
                 ctx.fillText(l,540,y);
-                y+=lineH;
+                y+=size+15;
             });
 
-            ctx.drawImage(img,0,topH,1080,1080-topH);
+            let px=parseInt(document.getElementById("pixel").value);
+            if(px>1){
+                pixelate(ctx,c,px);
+            }
 
-            const normal = c.toDataURL("image/jpeg",0.95);
+            ctx.drawImage(img,0,y,1080,1080-y);
 
-            // BLUR VERSION
-            const c2 = document.createElement("canvas");
-            c2.width=1080;
-            c2.height=1080;
-            const cx = c2.getContext("2d");
+            let normal=c.toDataURL("image/jpeg",0.95);
 
-            cx.filter="blur(10px)";
-            cx.drawImage(c,0,0);
-
-            const blur = c2.toDataURL("image/jpeg",0.95);
-
-            res({normal,blur,idx});
+            res({normal});
         };
-
-        img.src=url;
     });
 }
 
 async function start(){
+    let texts=document.getElementById("texts").value.split("///");
+    let fontType=document.getElementById("font").value;
 
-    const texts = document.getElementById("texts").value
-        .split("///")
-        .map(t=>t.trim())
-        .filter(t=>t);
-
-    const zip = new JSZip();
-
-    let bar = document.getElementById("bar");
+    let zip=new JSZip();
+    let bar=document.getElementById("bar");
 
     for(let i=0;i<files.length;i++){
+        let r=await render(files[i],texts[i]||"",fontType);
 
-        let t = texts[i] || "";
+        zip.file(`${i+1}.jpg`,r.normal.split(",")[1],{base64:true});
 
-        let r = await renderImage(files[i],t,i+1);
-
-        let n = r.normal.split(",")[1];
-        let b = r.blur.split(",")[1];
-
-        zip.file(`${i+1}.jpg`, n, {base64:true});
-        zip.file(`${i+1}pix.jpg`, b, {base64:true});
-
-        bar.style.width = ((i+1)/files.length*100)+"%";
+        bar.style.width=((i+1)/files.length*100)+"%";
     }
 
-    const content = await zip.generateAsync({type:"blob"});
+    let out=await zip.generateAsync({type:"blob"});
 
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(content);
-    a.download = "images.zip";
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(out);
+    a.download="batch.zip";
     a.click();
 }
+
+renderPreview();
 
 </script>
 
