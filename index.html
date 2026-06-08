@@ -2,13 +2,12 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Batch Gallery FIX</title>
+<title>Smart Gallery Generator</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
 body{margin:0;font-family:Arial;background:#f5f5f5;padding:15px}
-
 .block{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px}
 
 .row{
@@ -18,14 +17,8 @@ gap:10px;
 margin-bottom:12px;
 }
 
-.card{
-background:#fff;
-padding:8px;
-border-radius:10px;
-}
-
+.card{background:#fff;padding:8px;border-radius:10px}
 img{width:100%;border-radius:10px}
-
 .small{font-size:12px;color:#666}
 
 input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
@@ -41,7 +34,7 @@ input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
 
 <div class="block">
 <h3>✍️ Тексти (///)</h3>
-<textarea id="texts">Ти можеш///Продовжуй///Не здавайся</textarea>
+<textarea id="texts">Ти можеш більше///Продовжуй рухатись вперед///Не здавайся ніколи</textarea>
 </div>
 
 <div class="block">
@@ -77,6 +70,7 @@ document.getElementById("files").addEventListener("change",e=>{
     files=[...e.target.files];
 });
 
+// 🔥 PIXEL
 function pixelate(canvas,ctx,factor){
     const w=canvas.width,h=canvas.height;
 
@@ -94,6 +88,38 @@ function pixelate(canvas,ctx,factor){
     ctx.drawImage(small,0,0,small.width,small.height,0,0,w,h);
 }
 
+// 🧠 SMART TEXT LAYOUT
+function smartLines(ctx,text,maxWidth){
+    let words=text.split(" ");
+    let lines=[""];
+
+    for(let w of words){
+        let test=lines[lines.length-1]+" "+w;
+
+        if(ctx.measureText(test).width>maxWidth){
+            lines.push(w);
+        }else{
+            lines[lines.length-1]=test;
+        }
+    }
+
+    return lines;
+}
+
+// 🔥 AUTO SIZE (важливо)
+function autoSize(ctx,text){
+    let size=90;
+
+    while(size>30){
+        ctx.font=`${size}px Arial`;
+        if(ctx.measureText(text).width<900) break;
+        size-=2;
+    }
+
+    return size;
+}
+
+// 🖼️ BASE RENDER
 function renderBase(file,text,font,wm){
 
     return new Promise(res=>{
@@ -104,45 +130,57 @@ function renderBase(file,text,font,wm){
         img.onload=()=>{
 
             let c=document.createElement("canvas");
-            c.width=1080;
-            c.height=1080;
+            c.width=1080;c.height=1080;
             let ctx=c.getContext("2d");
 
             ctx.fillStyle="#fff";
             ctx.fillRect(0,0,1080,1080);
 
-            ctx.fillStyle="#000";
-            ctx.font=`70px "${font}"`;
+            // 🔥 AUTO FONT SIZE
+            let size=autoSize(ctx,text);
+
+            ctx.font=`${size}px "${font}"`;
             ctx.textAlign="center";
+            ctx.fillStyle="#000";
 
-            let y=150;
+            let lines=smartLines(ctx,text,900);
 
-            text.split(" ").forEach(t=>{
-                ctx.fillText(t,540,y);
-                y+=80;
-            });
+            // 🔥 TOP HAS MORE TEXT DENSITY (compact)
+            let startY=120;
+            let lineH=size+8;
 
-            ctx.drawImage(img,0,300,1080,780);
+            if(lines.length===1){
+                startY=200; // single line center
+            }
 
+            let y=startY;
+
+            for(let l of lines){
+                ctx.fillText(l,540,y);
+                y+=lineH;
+            }
+
+            // IMAGE
+            ctx.drawImage(img,0,y,1080,1080-y);
+
+            // WATERMARK
             if(wm){
                 ctx.fillStyle="rgba(0,0,0,0.6)";
                 ctx.font="40px Arial";
                 ctx.fillText(wm,540,1040);
             }
 
-            res(c); // 🔥 чистий canvas
+            res(c);
         };
     });
 }
 
+// 🔥 PIX COPY
 function makePixelCopy(base,pixel){
-
     let c2=document.createElement("canvas");
-    c2.width=1080;
-    c2.height=1080;
+    c2.width=1080;c2.height=1080;
 
     let ctx2=c2.getContext("2d");
-
     ctx2.drawImage(base,0,0);
 
     if(pixel>1){
@@ -152,6 +190,7 @@ function makePixelCopy(base,pixel){
     return c2;
 }
 
+// 🚀 MAIN
 async function generate(){
 
     let texts=document.getElementById("texts").value.split("///");
