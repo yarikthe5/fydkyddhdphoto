@@ -205,7 +205,7 @@ async function generateAI(){
             method:"POST",
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({
-                inputs:`Write 5 short motivational quotes about: ${prompt}`
+                inputs:`${prompt}`
             })
         });
 
