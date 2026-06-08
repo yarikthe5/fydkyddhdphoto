@@ -2,30 +2,19 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Motivation Batch Generator PRO</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
-
+<title>Batch Generator FIX</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f5f5;}
-.wrap{max-width:720px;margin:auto;padding:12px;}
-.block{background:#fff;padding:12px;border-radius:12px;margin-bottom:10px;}
-textarea,input,select,button{width:100%;padding:12px;margin-top:8px;font-size:14px;}
-button{background:black;color:white;border:none;border-radius:10px;}
-.preview{border:1px solid #ddd;border-radius:10px;margin-top:8px;overflow:hidden;}
-canvas{width:100%;}
-.small{font-size:12px;color:#666;}
-#bar{height:10px;background:green;width:0%;}
-#progress{background:#ddd;border-radius:10px;overflow:hidden;}
+body{font-family:Arial;background:#f5f5f5;margin:0;padding:20px}
+.block{background:#fff;padding:10px;margin-bottom:10px;border-radius:10px}
+input,textarea{width:100%;padding:10px;margin-top:5px}
+button{width:100%;padding:12px;background:black;color:white;border:0;border-radius:10px}
+canvas{display:none}
 </style>
 </head>
 
 <body>
-
-<div class="wrap">
 
 <div class="block">
 <h3>📁 Фото</h3>
@@ -34,34 +23,7 @@ canvas{width:100%;}
 
 <div class="block">
 <h3>✍️ Тексти (///)</h3>
-<textarea id="texts">Ти сильніший ніж думаєш///
-Продовжуй навіть коли важко///
-Успіх — це дисципліна</textarea>
-</div>
-
-<div class="block">
-<h3>🇺🇦 Шрифти</h3>
-<select id="font">
-    <option value="Unbounded">Unbounded</option>
-    <option value="Playfair Display">Playfair Display</option>
-    <option value="Cormorant Garamond">Cormorant Garamond</option>
-    <option value="Comfortaa">Comfortaa</option>
-    <option value="Bad Script">Bad Script</option>
-</select>
-
-<h3>📏 Розмір</h3>
-<div style="display:flex;gap:8px;">
-<button onclick="changeSize(-5)">-</button>
-<input id="size" value="70">
-<button onclick="changeSize(5)">+</button>
-</div>
-
-<h3>🎨 Колір</h3>
-<input type="color" id="color" value="#000000">
-
-<h3>🧊 Пікселізація</h3>
-<input type="range" id="pixel" min="1" max="30" value="1">
-<div class="small">1 = normal, 30 = strong pixel</div>
+<textarea id="texts">Текст 1///Текст 2///Текст 3</textarea>
 </div>
 
 <div class="block">
@@ -70,19 +32,11 @@ canvas{width:100%;}
 </div>
 
 <div class="block">
-<h3>👀 Preview</h3>
-<canvas id="p1" width="540" height="540"></canvas>
-<canvas id="p2" width="540" height="540"></canvas>
-<canvas id="p3" width="540" height="540"></canvas>
+<h3>🧊 Pixel level (1 = normal, 20 = max)</h3>
+<input type="range" id="pixel" min="1" max="20" value="1">
 </div>
 
-<div class="block">
-<button onclick="start()">🚀 Generate ZIP</button>
-</div>
-
-<div id="progress"><div id="bar"></div></div>
-
-</div>
+<button onclick="start()">🚀 EXPORT ZIP</button>
 
 <script>
 
@@ -90,158 +44,101 @@ let files=[];
 
 document.getElementById("files").addEventListener("change",e=>{
     files=[...e.target.files];
-    renderPreview();
 });
 
-function changeSize(v){
-    let el=document.getElementById("size");
-    el.value=Math.max(20,Math.min(160,parseInt(el.value)+v));
-    renderPreview();
-}
+function pixelate(ctx, canvas, factor){
+    const w=canvas.width,h=canvas.height;
 
-function fontStyle(type,size){
-    return `${size}px "${type}", serif`;
-}
+    let temp=document.createElement("canvas");
+    temp.width=Math.max(1,Math.floor(w/factor));
+    temp.height=Math.max(1,Math.floor(h/factor));
 
-function wrap(ctx,text,w,maxLines){
-    let words=text.split(" ");
-    let lines=[""];
-    for(let w2 of words){
-        let t=lines[lines.length-1]+" "+w2;
-        if(ctx.measureText(t).width>w){
-            if(lines.length<maxLines) lines.push(w2);
-        }else lines[lines.length-1]=t;
-    }
-    return lines;
-}
+    let tctx=temp.getContext("2d");
 
-function pixelate(canvas, ctx, factor){
-    const w = canvas.width;
-    const h = canvas.height;
-
-    let small = document.createElement("canvas");
-    small.width = Math.max(1, Math.floor(w / factor));
-    small.height = Math.max(1, Math.floor(h / factor));
-
-    let sctx = small.getContext("2d");
-
-    sctx.imageSmoothingEnabled = false;
-    sctx.drawImage(canvas, 0, 0, small.width, small.height);
+    tctx.imageSmoothingEnabled=false;
+    tctx.drawImage(canvas,0,0,temp.width,temp.height);
 
     ctx.clearRect(0,0,w,h);
-
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(small, 0, 0, w, h);
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(temp,0,0,temp.width,temp.height,0,0,w,h);
 }
 
-function draw(canvas,text,fontType){
-    let ctx=canvas.getContext("2d");
-
-    ctx.fillStyle="#fff";
-    ctx.fillRect(0,0,540,540);
-
-    let size=parseInt(document.getElementById("size").value);
-    let color=document.getElementById("color").value;
-
-    ctx.font=fontStyle(fontType,size);
-    ctx.textAlign="center";
-
-    let lines=wrap(ctx,text,460,3);
-
-    let y=220;
-
-    ctx.fillStyle=color;
-    ctx.strokeStyle="rgba(0,0,0,0.7)";
-    ctx.lineWidth=5;
-
-    lines.forEach(l=>{
-        ctx.strokeText(l,270,y);
-        ctx.fillText(l,270,y);
-        y+=size+12;
-    });
-
-    let px=parseInt(document.getElementById("pixel").value);
-    if(px>1){
-        pixelate(canvas, ctx, px);
-    }
-
-    ctx.fillStyle="rgba(0,0,0,0.4)";
-    ctx.font="12px Arial";
-    ctx.fillText("PREVIEW",270,520);
-}
-
-function renderPreview(){
-    let t=document.getElementById("texts").value.split("///");
-
-    draw(p1,t[0]||"",font.value);
-    draw(p2,t[1]||"",font.value);
-    draw(p3,t[2]||"",font.value);
-}
-
-["texts","font","size","color","pixel"].forEach(id=>{
-    document.getElementById(id).addEventListener("input",renderPreview);
-});
-
-async function render(file,text,fontType){
+function renderImage(file,text,wm,pixel){
     return new Promise(res=>{
         let img=new Image();
         img.src=URL.createObjectURL(file);
 
         img.onload=()=>{
+
             let c=document.createElement("canvas");
-            c.width=1080;c.height=1080;
+            c.width=1080;
+            c.height=1080;
             let ctx=c.getContext("2d");
 
+            // BACKGROUND
             ctx.fillStyle="#fff";
             ctx.fillRect(0,0,1080,1080);
 
-            let size=parseInt(document.getElementById("size").value);
-            let color=document.getElementById("color").value;
-
-            ctx.font=fontStyle(fontType,size);
+            // TEXT
+            ctx.fillStyle="#000";
+            ctx.font="60px Arial";
             ctx.textAlign="center";
 
-            let lines=wrap(ctx,text,900,3);
+            let lines=text.split(" ");
+            let y=120;
 
-            let y=220;
-
-            ctx.fillStyle=color;
-            ctx.strokeStyle="black";
-            ctx.lineWidth=6;
-
-            lines.forEach(l=>{
-                ctx.strokeText(l,540,y);
-                ctx.fillText(l,540,y);
-                y+=size+15;
-            });
-
-            ctx.drawImage(img,0,y,1080,1080-y);
-
-            let px=parseInt(document.getElementById("pixel").value);
-            if(px>1){
-                pixelate(c, ctx, px);
+            for(let i=0;i<lines.length;i++){
+                ctx.fillText(lines[i],540,y);
+                y+=70;
             }
 
+            // IMAGE
+            ctx.drawImage(img,0,300,1080,780);
+
+            // WATERMARK (IMPORTANT FIX)
+            if(wm){
+                ctx.fillStyle="rgba(0,0,0,0.6)";
+                ctx.font="40px Arial";
+                ctx.fillText(wm,540,1040);
+            }
+
+            // SAVE NORMAL FIRST
             let normal=c.toDataURL("image/jpeg",0.95);
 
-            res({normal});
+            // PIXEL COPY (CRITICAL FIX)
+            let c2=document.createElement("canvas");
+            c2.width=1080;
+            c2.height=1080;
+            let ctx2=c2.getContext("2d");
+
+            ctx2.drawImage(c,0,0);
+
+            if(pixel>1){
+                pixelate(ctx2,c2,pixel);
+            }
+
+            let pix=c2.toDataURL("image/jpeg",0.95);
+
+            res({normal,pix});
         };
     });
 }
 
 async function start(){
     let texts=document.getElementById("texts").value.split("///");
-    let fontType=document.getElementById("font").value;
+    let wm=document.getElementById("wm").value;
+    let pixel=parseInt(document.getElementById("pixel").value);
 
     let zip=new JSZip();
-    let bar=document.getElementById("bar");
 
     for(let i=0;i<files.length;i++){
-        let r=await render(files[i],texts[i]||"",fontType);
+
+        let t=texts[i]||"";
+
+        let r=await renderImage(files[i],t,wm,pixel);
 
         zip.file(`${i+1}.jpg`,r.normal.split(",")[1],{base64:true});
-
-        bar.style.width=((i+1)/files.length*100)+"%";
+        zip.file(`${i+1}pix.jpg`,r.pix.split(",")[1],{base64:true});
     }
 
     let out=await zip.generateAsync({type:"blob"});
@@ -251,8 +148,6 @@ async function start(){
     a.download="batch.zip";
     a.click();
 }
-
-renderPreview();
 
 </script>
 
