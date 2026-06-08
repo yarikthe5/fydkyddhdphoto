@@ -189,47 +189,6 @@ function makePixelCopy(base,pixel){
 
     return c2;
 }
-
-// ---------------- AI GENERATION ----------------
-async function generateAI(){
-
-    let prompt=document.getElementById("prompt").value;
-
-    if(!prompt){
-        alert("Введи промпт");
-        return;
-    }
-
-    try{
-        let r=await fetch("https://api-inference.huggingface.co/models/gpt2",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-                inputs:`${prompt}`
-            })
-        });
-
-        let data=await r.json();
-
-        let text=data?.[0]?.generated_text || "";
-
-        let quotes=text
-        .split(".")
-        .map(t=>t.trim())
-        .filter(t=>t.length>10)
-        .slice(0,5)
-        .join("///");
-
-        document.getElementById("texts").value=quotes;
-
-    }catch(e){
-
-        // fallback
-        document.getElementById("texts").value=
-        "Ти можеш більше///Не здавайся///Продовжуй рух///Кожен день шанс///Будь сильним";
-    }
-}
-
 // ---------------- MAIN ----------------
 async function generate(){
 
