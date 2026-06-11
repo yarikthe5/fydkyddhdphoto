@@ -4,25 +4,65 @@
 <meta charset="UTF-8">
 <title>AI Motivation Gallery</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body{margin:0;font-family:Arial;background:#f5f5f5;padding:15px}
-
-.block{background:#fff;padding:10px;border-radius:10px;margin-bottom:10px}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-bottom:12px;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f5f5f5;
+  padding: 15px;
 }
 
-.card{background:#fff;padding:8px;border-radius:10px}
-img{width:100%;border-radius:10px}
-.small{font-size:12px;color:#666}
+.block {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 
-input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card {
+  background: #fff;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.small {
+  font-size: 12px;
+  color: #666;
+}
+
+input, textarea, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #0056b3;
+}
 </style>
 </head>
 
@@ -65,167 +105,169 @@ input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
 
 <script>
 
-let files=[];
+let files = [];
 
-document.getElementById("files").addEventListener("change",e=>{
-    files=[...e.target.files];
+document.getElementById("files").addEventListener("change", e => {
+    files = [...e.target.files];
 });
 
-// ---------------- PIXEL ----------------
-function pixelate(canvas,ctx,factor){
-    const w=canvas.width,h=canvas.height;
+// -------- PIXELATE --------
+function pixelate(canvas, ctx, factor) {
+    const w = canvas.width, h = canvas.height;
 
-    let small=document.createElement("canvas");
-    small.width=Math.max(1,Math.floor(w/factor));
-    small.height=Math.max(1,Math.floor(h/factor));
+    let small = document.createElement("canvas");
+    small.width = Math.max(1, Math.floor(w / factor));
+    small.height = Math.max(1, Math.floor(h / factor));
 
-    let sctx=small.getContext("2d");
+    let sctx = small.getContext("2d");
 
-    sctx.imageSmoothingEnabled=false;
-    sctx.drawImage(canvas,0,0,small.width,small.height);
+    sctx.imageSmoothingEnabled = false;
+    sctx.drawImage(canvas, 0, 0, small.width, small.height);
 
-    ctx.clearRect(0,0,w,h);
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(small,0,0,small.width,small.height,0,0,w,h);
+    ctx.clearRect(0, 0, w, h);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(small, 0, 0, small.width, small.height, 0, 0, w, h);
 }
 
-// ---------------- SMART TEXT ----------------
-function smartWrap(ctx,text,maxWidth){
-    let words=text.split(" ");
-    let lines=[""];
+// -------- SMART TEXT WRAPPING --------
+function smartWrap(ctx, text, maxWidth) {
+    let words = text.split(" ");
+    let lines = [""];
 
-    for(let w of words){
-        let test=lines[lines.length-1]+" "+w;
+    for (let w of words) {
+        let test = lines[lines.length - 1] + " " + w;
 
-        if(ctx.measureText(test).width>maxWidth){
+        if (ctx.measureText(test).width > maxWidth) {
             lines.push(w);
-        }else{
-            lines[lines.length-1]=test;
+        } else {
+            lines[lines.length - 1] = test;
         }
     }
 
     return lines;
 }
 
-// ---------------- AUTO SIZE ----------------
-function autoSize(ctx,text){
-    let size=90;
+// -------- AUTO SIZE TEXT --------
+function autoSize(ctx, text) {
+    let size = 90;
 
-    while(size>28){
-        ctx.font=`${size}px Arial`;
-        if(ctx.measureText(text).width<900) break;
-        size-=2;
+    while (size > 28) {
+        ctx.font = `${size}px Arial`;
+        if (ctx.measureText(text).width < 900) break;
+        size -= 2;
     }
 
     return size;
 }
 
-// ---------------- BASE RENDER ----------------
-function renderBase(file,text,font,wm){
+// -------- RENDER BASE IMAGE --------
+function renderBase(file, text, font, wm) {
 
-    return new Promise(res=>{
+    return new Promise(res => {
 
-        let img=new Image();
-        img.src=URL.createObjectURL(file);
+        let img = new Image();
+        img.src = URL.createObjectURL(file);
 
-        img.onload=()=>{
+        img.onload = () => {
 
-            let c=document.createElement("canvas");
-            c.width=1080;c.height=1080;
-            let ctx=c.getContext("2d");
+            let c = document.createElement("canvas");
+            c.width = 1080;
+            c.height = 1080;
+            let ctx = c.getContext("2d");
 
-            ctx.fillStyle="#fff";
-            ctx.fillRect(0,0,1080,1080);
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, 1080, 1080);
 
-            let size=autoSize(ctx,text);
+            let size = autoSize(ctx, text);
 
-            ctx.font=`${size}px "${font}"`;
-            ctx.textAlign="center";
-            ctx.fillStyle="#000";
+            ctx.font = `${size}px "${font}"`;
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#000";
 
-            let lines=smartWrap(ctx,text,900);
+            let lines = smartWrap(ctx, text, 900);
 
-            let y=(lines.length===1)?220:120;
+            let y = (lines.length === 1) ? 220 : 120;
 
-            let lineH=size+10;
+            let lineH = size + 10;
 
-            for(let l of lines){
-                ctx.fillText(l,540,y);
-                y+=lineH;
+            for (let l of lines) {
+                ctx.fillText(l, 540, y);
+                y += lineH;
             }
 
-            ctx.drawImage(img,0,y,1080,1080-y);
+            ctx.drawImage(img, 0, y, 1080, 1080 - y);
 
-            if(wm){
+            if (wm) {
+                ctx.font = "40px Arial";
+                ctx.textAlign = "center";
 
-    ctx.font="40px Arial";
-    ctx.textAlign="center";
+                // чорна обводка
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 8;
+                ctx.strokeText(wm, 540, 1040);
 
-    // чорна обводка
-    ctx.strokeStyle="#000";
-    ctx.lineWidth=8;
-    ctx.strokeText(wm,540,1040);
-
-    // білий текст
-    ctx.fillStyle="#fff";
-    ctx.fillText(wm,540,1040);
-}
+                // білий текст
+                ctx.fillStyle = "#fff";
+                ctx.fillText(wm, 540, 1040);
+            }
 
             res(c);
         };
     });
 }
 
-// ---------------- PIX COPY ----------------
-function makePixelCopy(base,pixel){
+// -------- MAKE PIXELATED COPY --------
+function makePixelCopy(base, pixel) {
 
-    let c2=document.createElement("canvas");
-    c2.width=1080;c2.height=1080;
+    let c2 = document.createElement("canvas");
+    c2.width = 1080;
+    c2.height = 1080;
 
-    let ctx2=c2.getContext("2d");
+    let ctx2 = c2.getContext("2d");
 
-    ctx2.drawImage(base,0,0);
+    ctx2.drawImage(base, 0, 0);
 
-    if(pixel>1){
-        pixelate(c2,ctx2,pixel);
+    if (pixel > 1) {
+        pixelate(c2, ctx2, pixel);
     }
 
     return c2;
 }
-// ---------------- MAIN ----------------
-async function generate(){
 
-    let texts=document.getElementById("texts").value.split("///");
-    let font=document.getElementById("font").value;
-    let pixel=parseInt(document.getElementById("pixel").value);
-    let watermarks=document.getElementById("wm").value.split("///");
+// -------- GENERATE GALLERY --------
+async function generate() {
 
-    let gallery=document.getElementById("gallery");
-    gallery.innerHTML="";
+    let texts = document.getElementById("texts").value.split("///");
+    let font = document.getElementById("font").value;
+    let pixel = parseInt(document.getElementById("pixel").value);
+    let watermarks = document.getElementById("wm").value.split("///");
 
-    for(let i=0;i<files.length;i++){
+    let gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
 
-        let base=await renderBase(
-    files[i],
-    texts[i]||"",
-    font,
-    watermarks[i]||watermarks[0]||""
-);
+    for (let i = 0; i < files.length; i++) {
 
-        let normal=base.toDataURL("image/jpeg",0.95);
-        let pix=makePixelCopy(base,pixel).toDataURL("image/jpeg",0.95);
+        let base = await renderBase(
+            files[i],
+            texts[i] || "",
+            font,
+            watermarks[i] || watermarks[0] || ""
+        );
 
-        let row=document.createElement("div");
-        row.className="row";
+        let normal = base.toDataURL("image/jpeg", 0.95);
+        let pix = makePixelCopy(base, pixel).toDataURL("image/jpeg", 0.95);
 
-        row.innerHTML=`
+        let row = document.createElement("div");
+        row.className = "row";
+
+        row.innerHTML = `
             <div class="card">
-                <div class="small">${i+1}pic</div>
+                <div class="small">${i + 1}pic</div>
                 <img src="${normal}">
             </div>
 
             <div class="card">
-                <div class="small">${i+1}pix</div>
+                <div class="small">${i + 1}pix</div>
                 <img src="${pix}">
             </div>
         `;
