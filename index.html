@@ -157,10 +157,19 @@ function renderBase(file,text,font,wm){
             ctx.drawImage(img,0,y,1080,1080-y);
 
             if(wm){
-                ctx.fillStyle="rgba(0,0,0,0.6)";
-                ctx.font="40px Arial";
-                ctx.fillText(wm,540,1040);
-            }
+
+    ctx.font="40px Arial";
+    ctx.textAlign="center";
+
+    // чорна обводка
+    ctx.strokeStyle="#000";
+    ctx.lineWidth=8;
+    ctx.strokeText(wm,540,1040);
+
+    // білий текст
+    ctx.fillStyle="#fff";
+    ctx.fillText(wm,540,1040);
+}
 
             res(c);
         };
