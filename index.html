@@ -55,8 +55,8 @@ input,textarea,select,button{width:100%;padding:10px;margin-top:5px}
 </div>
 
 <div class="block">
-<h3>💧 Watermark</h3>
-<input id="wm" placeholder="@brand">
+<h3>💧 Watermark (через ///)</h3>
+<input id="wm" placeholder="@brand1///@brand2///@brand3">
 </div>
 
 <button onclick="generate()">🚀 Generate Gallery</button>
@@ -189,14 +189,19 @@ async function generate(){
     let texts=document.getElementById("texts").value.split("///");
     let font=document.getElementById("font").value;
     let pixel=parseInt(document.getElementById("pixel").value);
-    let wm=document.getElementById("wm").value;
+    let watermarks=document.getElementById("wm").value.split("///");
 
     let gallery=document.getElementById("gallery");
     gallery.innerHTML="";
 
     for(let i=0;i<files.length;i++){
 
-        let base=await renderBase(files[i],texts[i]||"",font,wm);
+        let base=await renderBase(
+    files[i],
+    texts[i]||"",
+    font,
+    watermarks[i]||watermarks[0]||""
+);
 
         let normal=base.toDataURL("image/jpeg",0.95);
         let pix=makePixelCopy(base,pixel).toDataURL("image/jpeg",0.95);
