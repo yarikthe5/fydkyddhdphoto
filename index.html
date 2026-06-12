@@ -2,281 +2,525 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>AI Motivation Gallery</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOTIV — AI Gallery Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Comfortaa:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #f5f5f5;
-  padding: 15px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --accent:#C9A84C;
+  --accent2:#E8C96B;
+  --bg:#0A0A0A;
+  --bg2:#111111;
+  --bg3:#1A1A1A;
+  --bg4:#222222;
+  --surface:#141414;
+  --border:rgba(201,168,76,0.18);
+  --border2:rgba(201,168,76,0.35);
+  --text:#F0EAD6;
+  --text2:#9A9082;
+  --text3:#6A6058;
+  --glow:rgba(201,168,76,0.15);
+  --radius:14px;
+  --radius2:22px;
+  --transition:cubic-bezier(0.25,0.46,0.45,0.94);
 }
 
-.block {
-  background: #fff;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
+[data-theme="midnight"] {
+  --accent:#4FC3F7;--accent2:#81D4FA;
+  --bg:#050912;--bg2:#080F1E;--bg3:#0D1628;--bg4:#121D34;
+  --surface:#0A1020;--border:rgba(79,195,247,0.18);--border2:rgba(79,195,247,0.38);
+  --text:#DFF0FF;--text2:#5E8BA8;--text3:#3A5B70;--glow:rgba(79,195,247,0.12);
+}
+[data-theme="crimson"] {
+  --accent:#D4415A;--accent2:#E8637A;
+  --bg:#0A0505;--bg2:#120809;--bg3:#1C0D0E;--bg4:#241213;
+  --surface:#100707;--border:rgba(212,65,90,0.2);--border2:rgba(212,65,90,0.4);
+  --text:#F5E8E8;--text2:#8A5A60;--text3:#5A3A3E;--glow:rgba(212,65,90,0.12);
+}
+[data-theme="forest"] {
+  --accent:#4CAF82;--accent2:#6FCFA0;
+  --bg:#030A06;--bg2:#060F09;--bg3:#0A1810;--bg4:#0F2016;
+  --surface:#060D08;--border:rgba(76,175,130,0.18);--border2:rgba(76,175,130,0.35);
+  --text:#E0F5EC;--text2:#4A8066;--text3:#2E5540;--glow:rgba(76,175,130,0.12);
+}
+[data-theme="violet"] {
+  --accent:#9B59B6;--accent2:#B77FD4;
+  --bg:#07050A;--bg2:#0D0B14;--bg3:#14101E;--bg4:#1C1628;
+  --surface:#0A0810;--border:rgba(155,89,182,0.2);--border2:rgba(155,89,182,0.38);
+  --text:#EDE8F5;--text2:#6A508A;--text3:#46345E;--glow:rgba(155,89,182,0.12);
 }
 
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
-}
+html,body{background:var(--bg);color:var(--text);font-family:'Unbounded',sans-serif;min-height:100vh;transition:background 0.5s var(--transition),color 0.5s var(--transition)}
 
-.card {
-  background: #fff;
-  padding: 8px;
-  border-radius: 10px;
-}
+/* HEADER */
+.header{padding:28px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:22px;font-weight:900;letter-spacing:0.08em;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase}
+.logo-sub{display:block;font-size:9px;font-weight:300;letter-spacing:0.3em;color:var(--text3);-webkit-text-fill-color:var(--text3);margin-top:2px}
 
-.card img {
-  width: 100%;
-  border-radius: 10px;
-}
+/* THEME SWITCHER */
+.themes{display:flex;gap:8px;align-items:center}
+.theme-btn{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.2s,border-color 0.2s;position:relative;outline:none}
+.theme-btn:hover{transform:scale(1.2)}
+.theme-btn.active{border-color:var(--text)}
+.theme-btn[data-t="gold"]{background:linear-gradient(135deg,#C9A84C,#E8C96B)}
+.theme-btn[data-t="midnight"]{background:linear-gradient(135deg,#1A3A5C,#4FC3F7)}
+.theme-btn[data-t="crimson"]{background:linear-gradient(135deg,#5C1A1A,#D4415A)}
+.theme-btn[data-t="forest"]{background:linear-gradient(135deg,#0A2E14,#4CAF82)}
+.theme-btn[data-t="violet"]{background:linear-gradient(135deg,#1A0A2E,#9B59B6)}
 
-.small {
-  font-size: 12px;
-  color: #666;
-}
+/* MAIN LAYOUT */
+.wrap{padding:28px 24px;max-width:1400px;margin:0 auto}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr}}
 
-input, textarea, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  box-sizing: border-box;
-}
+/* BLOCKS */
+.block{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:22px 20px;transition:background 0.5s,border 0.5s;position:relative;overflow:hidden}
+.block::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 10%,var(--glow),transparent 60%);pointer-events:none;opacity:0;transition:opacity 0.4s}
+.block:hover::before{opacity:1}
 
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold;
-}
+.block-label{font-size:9px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.block-label::before{content:'';display:block;width:18px;height:1px;background:var(--accent);flex-shrink:0}
 
-button:hover {
-  background: #0056b3;
-}
+/* INPUTS */
+input[type=file]{display:none}
+.file-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;background:var(--bg3)}
+.file-zone:hover,.file-zone.drag{border-color:var(--accent);background:rgba(201,168,76,0.05)}
+.file-zone-icon{font-size:32px;margin-bottom:10px;opacity:0.5}
+.file-zone-text{font-size:11px;color:var(--text2);font-family:'Comfortaa',sans-serif;line-height:1.6}
+.file-zone-count{font-size:13px;font-weight:600;color:var(--accent);margin-top:6px}
+
+textarea,select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Comfortaa',sans-serif;font-size:13px;padding:12px 14px;transition:border-color 0.3s,background 0.3s;resize:vertical;outline:none;appearance:none}
+textarea:focus,select:focus{border-color:var(--accent);background:var(--bg4)}
+textarea{min-height:90px;line-height:1.6}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A9082' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+
+/* RANGE */
+.range-wrap{display:flex;align-items:center;gap:14px}
+.range-val{font-size:15px;font-weight:700;color:var(--accent);min-width:28px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--bg4);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid var(--bg);box-shadow:0 0 10px var(--glow);transition:transform 0.2s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+/* WATERMARK TAGS */
+.wm-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.wm-tag{background:var(--bg3);border:1px solid var(--border);border-radius:40px;padding:6px 14px;font-size:11px;font-family:'Comfortaa',sans-serif;color:var(--text2);display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.2s,color 0.2s}
+.wm-tag:hover{border-color:var(--accent);color:var(--text)}
+.wm-tag.active{border-color:var(--accent);color:var(--accent);background:rgba(201,168,76,0.08)}
+.wm-input-row{display:flex;gap:8px}
+.wm-input-row input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Comfortaa',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color 0.3s}
+.wm-input-row input:focus{border-color:var(--accent)}
+.wm-add-btn{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 18px;color:var(--accent);font-size:18px;cursor:pointer;transition:background 0.2s,transform 0.15s;flex-shrink:0;font-weight:300}
+.wm-add-btn:hover{background:var(--accent);color:var(--bg);transform:scale(1.05)}
+
+/* GENERATE BUTTON */
+.gen-btn{width:100%;padding:18px 24px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius2);color:var(--bg);font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:transform 0.2s,box-shadow 0.3s,opacity 0.2s;box-shadow:0 4px 30px var(--glow);margin-top:20px;position:relative;overflow:hidden}
+.gen-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-100%);transition:transform 0s}
+.gen-btn:hover::after{transform:translateX(100%);transition:transform 0.7s}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px var(--glow),0 2px 0 rgba(255,255,255,0.2) inset}
+.gen-btn:active{transform:translateY(0) scale(0.98)}
+.gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+
+/* PROGRESS */
+.progress-bar{width:100%;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:12px;display:none}
+.progress-bar.show{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;width:0;transition:width 0.3s var(--transition)}
+
+/* GALLERY */
+.gallery{margin-top:32px}
+.gallery-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.gallery-title{font-size:10px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:var(--text3)}
+.gallery-count{font-size:11px;color:var(--accent);font-family:'Comfortaa',sans-serif}
+
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+@media(max-width:500px){.gallery-grid{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;transition:transform 0.3s var(--transition),border-color 0.3s,box-shadow 0.3s;animation:fadeUp 0.5s var(--transition) both}
+.card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 12px 40px rgba(0,0,0,0.4),0 0 0 1px var(--border2)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.card-inner{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.card-half{position:relative;overflow:hidden;cursor:pointer}
+.card-half img{width:100%;display:block;aspect-ratio:1;object-fit:cover;transition:transform 0.6s var(--transition)}
+.card-half:hover img{transform:scale(1.04)}
+.card-half-label{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent)}
+
+.card-actions{padding:14px 16px;display:flex;gap:10px;align-items:center;justify-content:flex-end;border-top:1px solid var(--border)}
+.dl-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:600;letter-spacing:0.15em;color:var(--accent);cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.15s;text-transform:uppercase}
+.dl-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent);transform:scale(1.03)}
+.dl-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);border:none}
+.dl-btn.primary:hover{opacity:0.9;transform:scale(1.03)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 24px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:0.3}
+.empty-text{font-family:'Comfortaa',sans-serif;font-size:13px;line-height:1.7;color:var(--text3)}
+
+/* FONT SELECTOR CUSTOM */
+.font-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:400px){.font-grid{grid-template-columns:repeat(2,1fr)}}
+.font-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;user-select:none}
+.font-opt:hover{border-color:var(--border2)}
+.font-opt.selected{border-color:var(--accent);background:rgba(201,168,76,0.07)}
+.font-opt-name{font-size:16px;line-height:1.3;color:var(--text);margin-bottom:4px}
+.font-opt-label{font-size:9px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;font-family:'Unbounded',sans-serif}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent);color:var(--bg);padding:12px 20px;border-radius:12px;font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;transform:translateY(80px);opacity:0;transition:transform 0.4s var(--transition),opacity 0.4s;z-index:999;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* SECTION SEP */
+.sep{height:1px;background:var(--border);margin:24px 0}
+
+.full-block{grid-column:1/-1}
 </style>
 </head>
-
 <body>
 
-<div class="block">
-<h3>📁 Фото</h3>
-<input type="file" id="files" webkitdirectory multiple>
+<div class="header">
+  <div>
+    <div class="logo">MOTIV<span class="logo-sub">AI Gallery Studio</span></div>
+  </div>
+  <div class="themes" title="Тема">
+    <div class="theme-btn active" data-t="gold" onclick="setTheme('')" title="Gold"></div>
+    <div class="theme-btn" data-t="midnight" onclick="setTheme('midnight')" title="Midnight"></div>
+    <div class="theme-btn" data-t="crimson" onclick="setTheme('crimson')" title="Crimson"></div>
+    <div class="theme-btn" data-t="forest" onclick="setTheme('forest')" title="Forest"></div>
+    <div class="theme-btn" data-t="violet" onclick="setTheme('violet')" title="Violet"></div>
+  </div>
 </div>
 
-<div class="block">
-<h3>✍️ Тексти (///)</h3>
-<textarea id="texts">Секс///Максім Макакін:///каза плюс максем равно люоф</textarea>
+<div class="wrap">
+  <div class="grid-2">
+
+    <!-- PHOTOS -->
+    <div class="block">
+      <div class="block-label">Фото</div>
+      <input type="file" id="files" webkitdirectory multiple accept="image/*">
+      <div class="file-zone" id="fileZone" onclick="document.getElementById('files').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+        <div class="file-zone-icon">🖼</div>
+        <div class="file-zone-text">Натисни або перетягни фото<br>підтримка директорій</div>
+        <div class="file-zone-count" id="fileCount"></div>
+      </div>
+    </div>
+
+    <!-- TEXTS -->
+    <div class="block">
+      <div class="block-label">Тексти</div>
+      <div class="file-zone-text" style="font-family:'Comfortaa',sans-serif;font-size:11px;color:var(--text3);margin-bottom:8px">Розділяй через <span style="color:var(--accent)">///</span> — кожен текст для свого фото</div>
+      <textarea id="texts" placeholder="Тут твій текст///Другий текст///Третій"></textarea>
+    </div>
+
+    <!-- FONT -->
+    <div class="block">
+      <div class="block-label">Шрифт</div>
+      <div class="font-grid" id="fontGrid"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="block">
+      <div class="block-label">Налаштування</div>
+
+      <div class="file-zone-text" style="font-size:10px;color:var(--text3);margin-bottom:8px;font-family:'Comfortaa',sans-serif">Пікселізація</div>
+      <div class="range-wrap">
+        <input type="range" id="pixel" min="1" max="20" value="1" oninput="document.getElementById('pixVal').textContent=this.value">
+        <span class="range-val" id="pixVal">1</span>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="file-zone-text" style="font-size:10px;color:var(--text3);margin-bottom:8px;font-family:'Comfortaa',sans-serif">Водяний знак</div>
+      <div class="wm-input-row">
+        <input id="wmInput" placeholder="@бренд" onkeydown="if(event.key==='Enter')addWm()">
+        <button class="wm-add-btn" onclick="addWm()">+</button>
+      </div>
+      <div class="wm-wrap" id="wmWrap"></div>
+    </div>
+
+  </div>
+
+  <button class="gen-btn" id="genBtn" onclick="generate()">
+    ✦ &nbsp; Згенерувати галерею
+  </button>
+  <div class="progress-bar" id="progress">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="gallery" id="galleryOut">
+    <div class="empty">
+      <div class="empty-icon">✦</div>
+      <div class="empty-text">Завантаж фото і натисни<br>«Згенерувати» — магія починається</div>
+    </div>
+  </div>
 </div>
 
-<div class="block">
-<h3>🇺🇦 Шрифт</h3>
-<select id="font">
-<option value="Unbounded">Unbounded</option>
-<option value="Playfair Display">Playfair Display</option>
-<option value="Cormorant Garamond">Cormorant</option>
-<option value="Comfortaa">Comfortaa</option>
-<option value="Bad Script">Bad Script</option>
-</select>
-</div>
-
-<div class="block">
-<h3>🧊 Pixel</h3>
-<input type="range" id="pixel" min="1" max="20" value="1">
-</div>
-
-<div class="block">
-<h3>💧 Watermark (через ///)</h3>
-<input id="wm" placeholder="@brand1///@brand2///@brand3">
-</div>
-
-<button onclick="generate()">🚀 Generate Gallery</button>
-
-<div id="gallery"></div>
+<div class="toast" id="toast"></div>
 
 <script>
+const FONTS=[
+  {name:'Unbounded',label:'Unbounded',sample:'Unbounded'},
+  {name:'Playfair Display',label:'Playfair',sample:'Playfair Display'},
+  {name:'Cormorant Garamond',label:'Cormorant',sample:'Cormorant Garamond'},
+  {name:'Comfortaa',label:'Comfortaa',sample:'Comfortaa'},
+  {name:'Bad Script',label:'Bad Script',sample:'Bad Script'},
+];
+let selectedFont='Unbounded';
+let files=[];
+let watermarks=[];
+let canvasCache=[];
 
-let files = [];
-
-document.getElementById("files").addEventListener("change", e => {
-    files = [...e.target.files];
+// FONT GRID
+const fg=document.getElementById('fontGrid');
+FONTS.forEach(f=>{
+  const d=document.createElement('div');
+  d.className='font-opt'+(f.name===selectedFont?' selected':'');
+  d.innerHTML=`<div class="font-opt-name" style="font-family:'${f.sample}',serif">${f.label}</div><div class="font-opt-label">${f.label}</div>`;
+  d.onclick=()=>{
+    selectedFont=f.name;
+    fg.querySelectorAll('.font-opt').forEach(x=>x.classList.remove('selected'));
+    d.classList.add('selected');
+  };
+  fg.appendChild(d);
 });
 
-// -------- PIXELATE --------
-function pixelate(canvas, ctx, factor) {
-    const w = canvas.width, h = canvas.height;
-
-    let small = document.createElement("canvas");
-    small.width = Math.max(1, Math.floor(w / factor));
-    small.height = Math.max(1, Math.floor(h / factor));
-
-    let sctx = small.getContext("2d");
-
-    sctx.imageSmoothingEnabled = false;
-    sctx.drawImage(canvas, 0, 0, small.width, small.height);
-
-    ctx.clearRect(0, 0, w, h);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(small, 0, 0, small.width, small.height, 0, 0, w, h);
+// FILE UPLOAD
+document.getElementById('files').addEventListener('change',e=>{
+  files=[...e.target.files];
+  document.getElementById('fileCount').textContent=files.length?`${files.length} фото вибрано`:'';
+});
+function onDrag(e,on){e.preventDefault();document.getElementById('fileZone').classList.toggle('drag',on)}
+function onDrop(e){
+  e.preventDefault();
+  document.getElementById('fileZone').classList.remove('drag');
+  const dt=e.dataTransfer;
+  files=[...dt.files].filter(f=>f.type.startsWith('image/'));
+  document.getElementById('fileCount').textContent=files.length?`${files.length} фото`:'';
 }
 
-// -------- SMART TEXT WRAPPING --------
-function smartWrap(ctx, text, maxWidth) {
-    let words = text.split(" ");
-    let lines = [""];
-
-    for (let w of words) {
-        let test = lines[lines.length - 1] + " " + w;
-
-        if (ctx.measureText(test).width > maxWidth) {
-            lines.push(w);
-        } else {
-            lines[lines.length - 1] = test;
-        }
-    }
-
-    return lines;
+// WATERMARKS
+function addWm(){
+  const inp=document.getElementById('wmInput');
+  const val=inp.value.trim();
+  if(!val)return;
+  if(!watermarks.includes(val)){
+    watermarks.push(val);
+    renderWmTags();
+  }
+  inp.value='';
+}
+function removeWm(i){watermarks.splice(i,1);renderWmTags()}
+function renderWmTags(){
+  const w=document.getElementById('wmWrap');
+  w.innerHTML='';
+  watermarks.forEach((m,i)=>{
+    const t=document.createElement('div');
+    t.className='wm-tag active';
+    t.innerHTML=`${m}<span style="opacity:0.5;margin-left:2px;font-size:13px" onclick="removeWm(${i})">×</span>`;
+    w.appendChild(t);
+  });
 }
 
-// -------- AUTO SIZE TEXT --------
-function autoSize(ctx, text) {
-    let size = 90;
-
-    while (size > 28) {
-        ctx.font = `${size}px Arial`;
-        if (ctx.measureText(text).width < 900) break;
-        size -= 2;
-    }
-
-    return size;
+// THEME
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  document.querySelectorAll('.theme-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.t===(t||'gold'));
+  });
 }
 
-// -------- RENDER BASE IMAGE --------
-function renderBase(file, text, font, wm) {
-
-    return new Promise(res => {
-
-        let img = new Image();
-        img.src = URL.createObjectURL(file);
-
-        img.onload = () => {
-
-            let c = document.createElement("canvas");
-            c.width = 1080;
-            c.height = 1080;
-            let ctx = c.getContext("2d");
-
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(0, 0, 1080, 1080);
-
-            let size = autoSize(ctx, text);
-
-            ctx.font = `${size}px "${font}"`;
-            ctx.textAlign = "center";
-            ctx.fillStyle = "#000";
-
-            let lines = smartWrap(ctx, text, 900);
-
-            let y = (lines.length === 1) ? 220 : 120;
-
-            let lineH = size + 10;
-
-            for (let l of lines) {
-                ctx.fillText(l, 540, y);
-                y += lineH;
-            }
-
-            ctx.drawImage(img, 0, y, 1080, 1080 - y);
-
-            if (wm) {
-                ctx.font = "40px Arial";
-                ctx.textAlign = "center";
-
-                // чорна обводка
-                ctx.strokeStyle = "#000";
-                ctx.lineWidth = 8;
-                ctx.strokeText(wm, 540, 1040);
-
-                // білий текст
-                ctx.fillStyle = "#fff";
-                ctx.fillText(wm, 540, 1040);
-            }
-
-            res(c);
-        };
-    });
+// TOAST
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2200);
 }
 
-// -------- MAKE PIXELATED COPY --------
-function makePixelCopy(base, pixel) {
-
-    let c2 = document.createElement("canvas");
-    c2.width = 1080;
-    c2.height = 1080;
-
-    let ctx2 = c2.getContext("2d");
-
-    ctx2.drawImage(base, 0, 0);
-
-    if (pixel > 1) {
-        pixelate(c2, ctx2, pixel);
-    }
-
-    return c2;
+// PIXELATE
+function pixelate(canvas,ctx,factor){
+  const w=canvas.width,h=canvas.height;
+  const s=document.createElement('canvas');
+  s.width=Math.max(1,Math.floor(w/factor));
+  s.height=Math.max(1,Math.floor(h/factor));
+  const sc=s.getContext('2d');
+  sc.imageSmoothingEnabled=false;
+  sc.drawImage(canvas,0,0,s.width,s.height);
+  ctx.clearRect(0,0,w,h);
+  ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(s,0,0,s.width,s.height,0,0,w,h);
 }
 
-// -------- GENERATE GALLERY --------
-async function generate() {
-
-    let texts = document.getElementById("texts").value.split("///");
-    let font = document.getElementById("font").value;
-    let pixel = parseInt(document.getElementById("pixel").value);
-    let watermarks = document.getElementById("wm").value.split("///");
-
-    let gallery = document.getElementById("gallery");
-    gallery.innerHTML = "";
-
-    for (let i = 0; i < files.length; i++) {
-
-        let base = await renderBase(
-            files[i],
-            texts[i] || "",
-            font,
-            watermarks[i] || watermarks[0] || ""
-        );
-
-        let normal = base.toDataURL("image/jpeg", 0.95);
-        let pix = makePixelCopy(base, pixel).toDataURL("image/jpeg", 0.95);
-
-        let row = document.createElement("div");
-        row.className = "row";
-
-        row.innerHTML = `
-            <div class="card">
-                <div class="small">${i + 1}pic</div>
-                <img src="${normal}">
-            </div>
-
-            <div class="card">
-                <div class="small">${i + 1}pix</div>
-                <img src="${pix}">
-            </div>
-        `;
-
-        gallery.appendChild(row);
-    }
+function smartWrap(ctx,text,maxWidth){
+  const words=text.split(' ');let lines=[''];
+  for(const w of words){
+    const test=(lines[lines.length-1]+' '+w).trim();
+    if(ctx.measureText(test).width>maxWidth)lines.push(w);
+    else lines[lines.length-1]=test;
+  }
+  return lines;
 }
 
+function autoSize(ctx,text,font){
+  let size=110;
+  while(size>26){
+    ctx.font=`${size}px "${font}"`;
+    if(ctx.measureText(text).width<920)break;
+    size-=2;
+  }
+  return size;
+}
+
+function renderBase(file,text,font,wm){
+  return new Promise(res=>{
+    const img=new Image();
+    img.src=URL.createObjectURL(file);
+    img.onload=()=>{
+      const c=document.createElement('canvas');
+      c.width=1080;c.height=1080;
+      const ctx=c.getContext('2d');
+      ctx.fillStyle='#0A0A0A';
+      ctx.fillRect(0,0,1080,1080);
+
+      const hasText=text&&text.trim();
+      let imgY=0;
+
+      if(hasText){
+        const size=autoSize(ctx,text,font);
+        ctx.font=`${size}px "${font}"`;
+        ctx.textAlign='center';
+        const lines=smartWrap(ctx,text,900);
+        const lineH=size+14;
+        const blockH=lines.length*lineH+40;
+        imgY=blockH;
+        let y=blockH/2-((lines.length-1)*lineH)/2+size/3;
+        if(lines.length===1)y=blockH/2+size/3;
+
+        // Text shadow/glow
+        ctx.shadowColor='rgba(0,0,0,0.8)';
+        ctx.shadowBlur=20;
+        ctx.fillStyle='#FFFFFF';
+        for(const l of lines){ctx.fillText(l,540,y);y+=lineH}
+        ctx.shadowBlur=0;
+      }
+
+      // Image
+      const imgH=1080-imgY;
+      ctx.drawImage(img,0,imgY,1080,imgH);
+
+      // Vignette overlay at text boundary
+      if(hasText&&imgY>0){
+        const grad=ctx.createLinearGradient(0,imgY-30,0,imgY+60);
+        grad.addColorStop(0,'rgba(10,10,10,0.95)');
+        grad.addColorStop(0.5,'rgba(10,10,10,0.3)');
+        grad.addColorStop(1,'transparent');
+        ctx.fillStyle=grad;
+        ctx.fillRect(0,imgY-30,1080,90);
+      }
+
+      // Watermark
+      if(wm){
+        ctx.font='bold 38px "Unbounded"';
+        ctx.textAlign='center';
+        ctx.letterSpacing='0.1em';
+        ctx.strokeStyle='rgba(0,0,0,0.9)';
+        ctx.lineWidth=10;
+        ctx.strokeText(wm,540,1048);
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.fillText(wm,540,1048);
+      }
+
+      res(c);
+    };
+    img.onerror=()=>res(null);
+  });
+}
+
+function makePixelCopy(base,factor){
+  const c=document.createElement('canvas');
+  c.width=1080;c.height=1080;
+  const ctx=c.getContext('2d');
+  ctx.drawImage(base,0,0);
+  if(factor>1)pixelate(c,ctx,factor);
+  return c;
+}
+
+// GENERATE
+async function generate(){
+  if(!files.length){toast('Спочатку вибери фото');return}
+  const texts=document.getElementById('texts').value.split('///');
+  const pixel=parseInt(document.getElementById('pixel').value);
+  const wms=watermarks.length?watermarks:[''];
+  const btn=document.getElementById('genBtn');
+  const pg=document.getElementById('progress');
+  const fill=document.getElementById('progressFill');
+
+  btn.disabled=true;
+  pg.classList.add('show');
+  canvasCache=[];
+
+  const out=document.getElementById('galleryOut');
+  out.innerHTML=`<div class="gallery-header"><span class="gallery-title">Генерація...</span></div><div class="gallery-grid" id="gg"></div>`;
+  const gg=document.getElementById('gg');
+
+  for(let i=0;i<files.length;i++){
+    fill.style.width=((i/files.length)*100)+'%';
+    const base=await renderBase(files[i],texts[i]||'',selectedFont,wms[i%wms.length]||wms[0]||'');
+    if(!base)continue;
+    const pix=makePixelCopy(base,pixel);
+    canvasCache.push({base,pix,name:files[i].name});
+
+    const normal=base.toDataURL('image/jpeg',0.95);
+    const pixData=pix.toDataURL('image/jpeg',0.95);
+    const idx=i;
+
+    const card=document.createElement('div');
+    card.className='card';
+    card.style.animationDelay=(i*0.07)+'s';
+    card.innerHTML=`
+      <div class="card-inner">
+        <div class="card-half" onclick="dl('${idx}','orig')" title="Завантажити оригінал">
+          <img src="${normal}" loading="lazy">
+          <div class="card-half-label">orig</div>
+        </div>
+        <div class="card-half" onclick="dl('${idx}','pix')" title="Завантажити піксель">
+          <img src="${pixData}" loading="lazy">
+          <div class="card-half-label">pix ×${pixel}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="dl-btn" onclick="dl('${idx}','orig')">Orig</button>
+        <button class="dl-btn primary" onclick="dl('${idx}','pix')">Pixel</button>
+        <button class="dl-btn" onclick="dlBoth(${idx})">Обидва</button>
+      </div>
+    `;
+    gg.appendChild(card);
+  }
+
+  fill.style.width='100%';
+  setTimeout(()=>{pg.classList.remove('show');fill.style.width='0'},600);
+
+  const hdr=out.querySelector('.gallery-title');
+  if(hdr)hdr.textContent=`Готово — ${files.length} фото`;
+  const cnt=document.querySelector('.gallery-count');
+  if(cnt)cnt.textContent='';
+
+  btn.disabled=false;
+  toast(`✦ ${files.length} фото готово`);
+}
+
+function dl(idx,type){
+  const c=canvasCache[parseInt(idx)];
+  if(!c)return;
+  const canvas=type==='orig'?c.base:c.pix;
+  const a=document.createElement('a');
+  a.href=canvas.toDataURL('image/jpeg',0.95);
+  a.download=(c.name.replace(/\.[^.]+$/,'')||'motiv')+'_'+type+'.jpg';
+  a.click();
+}
+function dlBoth(idx){dl(idx,'orig');setTimeout(()=>dl(idx,'pix'),300)}
 </script>
-
 </body>
 </html>
