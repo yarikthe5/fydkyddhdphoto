@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOTIR — AI Gallery Studio</title>
+<title>MOTIV — AI Gallery Studio</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Comfortaa:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -397,7 +397,12 @@ function renderWmTags(){
   const w=document.getElementById('wmWrap');w.innerHTML='';
   watermarks.forEach((m,i)=>{
     const t=document.createElement('div');t.className='wmt';
-    t.innerHTML=`${m} <span style="opacity:.5;cursor:pointer;font-size:13px" onclick="removeWm(${i})">×</span>`;
+    const span=document.createElement('span');
+    span.textContent='×';
+    span.style.cssText='opacity:.6;cursor:pointer;font-size:16px;font-weight:bold;padding:0 2px;line-height:1';
+    span.addEventListener('click',()=>removeWm(i));
+    t.appendChild(document.createTextNode(m+' '));
+    t.appendChild(span);
     w.appendChild(t);
   });
 }
@@ -444,12 +449,16 @@ function applyFx(canvas,ctx,fxType,str){
   if(fxType==='none') return;
   if(fxType==='pixel'){
     const f=Math.max(2,str);
+    const sw=Math.max(1,Math.floor(1080/f));
+    const sh=Math.max(1,Math.floor(1080/f));
     const s=document.createElement('canvas');
-    s.width=Math.max(1,Math.floor(1080/f));s.height=s.width;
-    const sc=s.getContext('2d');sc.imageSmoothingEnabled=false;
-    sc.drawImage(canvas,0,0,s.width,s.height);
+    s.width=sw;s.height=sh;
+    const sc=s.getContext('2d');
+    sc.imageSmoothingEnabled=false;
+    sc.drawImage(canvas,0,0,1080,1080,0,0,sw,sh);
     ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(s,0,0,s.width,s.height,0,0,1080,1080);
+    ctx.clearRect(0,0,1080,1080);
+    ctx.drawImage(s,0,0,sw,sh,0,0,1080,1080);
     ctx.imageSmoothingEnabled=true;
     return;
   }
@@ -507,9 +516,6 @@ function renderImage(img,textTop,wmStr,fxType,fxStr,overrideAuto){
   // Draw full image
   if(img) ctx.drawImage(img,0,0,1080,1080);
   else{ctx.fillStyle='#f5f5f5';ctx.fillRect(0,0,1080,1080);}
-
-  // Apply FX on image
-  applyFx(c,ctx,fxType,fxStr);
 
   if(hasText){
     const manualSize=parseInt(document.getElementById('topSize').value)||0;
@@ -576,6 +582,9 @@ function renderImage(img,textTop,wmStr,fxType,fxStr,overrideAuto){
     ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText(wmStr,540,1054);
     ctx.shadowColor='transparent';ctx.shadowBlur=0;
   }
+
+  // Apply FX to entire canvas (image + text + panel)
+  applyFx(c,ctx,fxType,fxStr);
 
   return c;
 }
