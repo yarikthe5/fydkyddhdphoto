@@ -177,7 +177,7 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
       <div class="sep"></div>
       <div class="lbl" style="margin-bottom:8px">Сила ефекту</div>
       <div class="rw">
-        <input type="range" id="fxStr" min="1" max="20" value="5" oninput="document.getElementById('fxV').textContent=this.value;updatePreview()">
+        <input type="range" id="fxStr" min="1" max="100" value="10" oninput="document.getElementById('fxV').textContent=this.value;updatePreview()">
         <span class="rv" id="fxV">5</span>
       </div>
       <div class="sep"></div>
@@ -448,26 +448,33 @@ function stripBrightness(img,yStart,yEnd){
 function applyFx(canvas,ctx,fxType,str){
   if(fxType==='none') return;
   if(fxType==='pixel'){
-    const f=Math.max(2,str);
-    const sw=Math.max(1,Math.floor(1080/f));
-    const sh=Math.max(1,Math.floor(1080/f));
+    const blockSize=Math.max(2,str*2); // str 1-100 → block 2-200px
+    const sw=Math.max(1,Math.ceil(1080/blockSize));
+    const sh=Math.max(1,Math.ceil(1080/blockSize));
     const s=document.createElement('canvas');
     s.width=sw;s.height=sh;
     const sc=s.getContext('2d');
     sc.imageSmoothingEnabled=false;
     sc.drawImage(canvas,0,0,1080,1080,0,0,sw,sh);
+    ctx.save();
     ctx.imageSmoothingEnabled=false;
     ctx.clearRect(0,0,1080,1080);
     ctx.drawImage(s,0,0,sw,sh,0,0,1080,1080);
-    ctx.imageSmoothingEnabled=true;
+    ctx.restore();
     return;
   }
   if(fxType==='blur'){
-    const tmp=document.createElement('canvas');tmp.width=1080;tmp.height=1080;
-    const tc=tmp.getContext('2d');tc.drawImage(canvas,0,0);
-    ctx.filter=`blur(${Math.max(1,str*2)}px)`;
-    ctx.clearRect(0,0,1080,1080);ctx.drawImage(tmp,0,0);
-    ctx.filter='none';return;
+    const radius=Math.max(1,str*3);
+    // snapshot current canvas into an image
+    const snap=new Image();
+    snap.src=canvas.toDataURL();
+    // sync draw trick: snap is already loaded since toDataURL is sync
+    ctx.filter=`blur(${radius}px)`;
+    // draw slightly oversized to avoid edge fading from blur
+    ctx.clearRect(0,0,1080,1080);
+    ctx.drawImage(canvas,-radius*2,-radius*2,1080+radius*4,1080+radius*4);
+    ctx.filter='none';
+    return;
   }
   const id=ctx.getImageData(0,0,1080,1080);const d=id.data;
   if(fxType==='bw'){
@@ -591,7 +598,7 @@ function renderImage(img,textTop,wmStr,fxType,fxStr,overrideAuto){
 
 // ===== LIVE PREVIEW =====
 function updatePreview(){
-  const textTop=(document.getElementById('textsTop').value.split('///')[0]||'').trim();
+  const textTop=(document.getElementById('textsTop').value.split(/\/\/\/\s*/)[0]||'').trim();
   const wm=watermarks[0]||'';
   const fxS=parseInt(document.getElementById('fxStr').value);
   const isAuto=document.getElementById('autoToggle').checked;
@@ -641,7 +648,7 @@ makeDraggable('hTop',posTop);
 // ===== GENERATE =====
 async function generate(){
   if(!files.length){toast('Спочатку вибери фото');return;}
-  const textsTop=document.getElementById('textsTop').value.split('///');
+  const textsTop=document.getElementById('textsTop').value.split(/\/\/\/\s*/).map(t=>t.trim());
   const wms=watermarks.length?watermarks:[''];
   const fxS=parseInt(document.getElementById('fxStr').value);
   const isAuto=document.getElementById('autoToggle').checked;
