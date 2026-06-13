@@ -19,7 +19,6 @@
 [data-theme="crimson"]{--a:#D4415A;--a2:#E8637A;--bg:#0A0505;--bg2:#120809;--bg3:#1C0D0E;--bg4:#241213;--bo:rgba(212,65,90,0.2);--bo2:rgba(212,65,90,0.4);--tx:#F5E8E8;--tx2:#8A5A60;--tx3:#5A3A3E;--gl:rgba(212,65,90,0.12)}
 [data-theme="forest"]{--a:#4CAF82;--a2:#6FCFA0;--bg:#030A06;--bg2:#060F09;--bg3:#0A1810;--bg4:#0F2016;--bo:rgba(76,175,130,0.18);--bo2:rgba(76,175,130,0.35);--tx:#E0F5EC;--tx2:#4A8066;--tx3:#2E5540;--gl:rgba(76,175,130,0.12)}
 [data-theme="violet"]{--a:#9B59B6;--a2:#B77FD4;--bg:#07050A;--bg2:#0D0B14;--bg3:#14101E;--bg4:#1C1628;--bo:rgba(155,89,182,0.2);--bo2:rgba(155,89,182,0.38);--tx:#EDE8F5;--tx2:#6A508A;--tx3:#46345E;--gl:rgba(155,89,182,0.12)}
-
 html,body{background:var(--bg);color:var(--tx);font-family:'Unbounded',sans-serif;min-height:100vh;transition:background .5s,color .5s}
 .hdr{padding:22px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .logo{font-size:20px;font-weight:900;letter-spacing:.08em;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -34,8 +33,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:'Unbounded',sans-seri
 .tb[data-t="violet"]{background:linear-gradient(135deg,#1A0A2E,#9B59B6)}
 .wrap{padding:20px;max-width:1400px;margin:0 auto}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:720px){.g2{grid-template-columns:1fr}}
-.full{grid-column:1/-1}
+@media(max-width:720px){.g2{grid-template-columns:1fr}}.full{grid-column:1/-1}
 .blk{background:var(--bg2);border:1px solid var(--bo);border-radius:var(--r2);padding:18px 16px;position:relative;overflow:hidden;transition:background .5s,border .5s}
 .blk::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 10%,var(--gl),transparent 60%);pointer-events:none;opacity:0;transition:opacity .4s}
 .blk:hover::before{opacity:1}
@@ -49,7 +47,6 @@ input[type=file]{display:none}
 .fz-cnt{font-size:12px;font-weight:600;color:var(--a);margin-top:5px}
 textarea,select,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--bo);border-radius:var(--r);color:var(--tx);font-family:'Comfortaa',sans-serif;font-size:12px;padding:10px 12px;transition:border-color .3s;resize:vertical;outline:none;appearance:none}
 textarea:focus,select:focus,input[type=text]:focus{border-color:var(--a)}
-select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239A9082' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
 .rw{display:flex;align-items:center;gap:12px;margin-top:8px}
 .rv{font-size:13px;font-weight:700;color:var(--a);min-width:36px;text-align:right}
 input[type=range]{flex:1;-webkit-appearance:none;height:2px;background:var(--bg4);border-radius:2px;outline:none;cursor:pointer}
@@ -62,7 +59,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .fo-nm{font-size:15px;line-height:1.3;color:var(--tx);margin-bottom:3px}
 .fo-lb{font-size:8px;letter-spacing:.2em;color:var(--tx3);text-transform:uppercase;font-family:'Unbounded',sans-serif}
 .wmw{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.wmt{background:var(--bg3);border:1px solid var(--a);border-radius:40px;padding:5px 12px;font-size:10px;font-family:'Comfortaa',sans-serif;color:var(--a);background:rgba(201,168,76,.07);display:flex;align-items:center;gap:6px}
+.wmt{background:rgba(201,168,76,.07);border:1px solid var(--a);border-radius:40px;padding:5px 12px;font-size:10px;font-family:'Comfortaa',sans-serif;color:var(--a);display:flex;align-items:center;gap:6px}
+.wmt-x{opacity:.6;cursor:pointer;font-size:16px;font-weight:bold;padding:0 2px;line-height:1;flex-shrink:0}
+.wmt-x:hover{opacity:1}
 .wmir{display:flex;gap:7px}
 .wmir input{flex:1}
 .wadd{background:var(--bg4);border:1px solid var(--bo2);border-radius:var(--r);padding:9px 16px;color:var(--a);font-size:16px;cursor:pointer;transition:background .2s;flex-shrink:0}
@@ -73,21 +72,20 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .cprow{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
 .cpitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;font-family:'Comfortaa',sans-serif}
 input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radius:8px;cursor:pointer;background:none;padding:2px}
-.editor-wrap{position:relative;width:100%;max-width:540px;margin:0 auto;touch-action:none}
+.editor-wrap{position:relative;width:100%;max-width:540px;margin:0 auto}
 .editor-canvas-wrap{position:relative;width:100%;aspect-ratio:1;border-radius:var(--r);overflow:hidden}
 #edCanvas{width:100%;height:100%;display:block}
-.handle{position:absolute;background:var(--a);border:2px solid #000;border-radius:50%;width:16px;height:16px;transform:translate(-50%,-50%);cursor:grab;touch-action:none;z-index:10;box-shadow:0 0 0 3px rgba(0,0,0,.5)}
+.handle{position:absolute;background:var(--a);border:2px solid #000;border-radius:50%;width:16px;height:16px;transform:translate(-50%,-50%);cursor:grab;touch-action:none;z-index:10;box-shadow:0 0 0 3px rgba(0,0,0,.5);display:none}
 .handle:active{cursor:grabbing}
-.handle-lbl{position:absolute;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--a);font-family:'Unbounded',sans-serif;white-space:nowrap;pointer-events:none;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:2px 6px;border-radius:4px}
-/* AUTO TOGGLE */
-.auto-wrap{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--bo2);border-radius:var(--r2);padding:16px 20px;gap:16px;flex-wrap:wrap}
-.toggle-track{position:relative;width:48px;height:26px;flex-shrink:0;cursor:pointer}
+.handle-lbl{position:absolute;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--a);font-family:'Unbounded',sans-serif;white-space:nowrap;pointer-events:none;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:2px 6px;border-radius:4px;display:none}
+.sep{height:1px;background:var(--bo);margin:14px 0}
+.auto-wrap{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--bo2);border-radius:var(--r2);padding:16px 20px;gap:16px;flex-wrap:wrap;margin-top:16px}
+.toggle-track{position:relative;width:48px;height:26px;flex-shrink:0;cursor:pointer;display:block}
 .toggle-track input{position:absolute;opacity:0;width:0;height:0}
 .toggle-bg{position:absolute;inset:0;border-radius:13px;background:var(--bg4);transition:background .3s}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .3s}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .3s;pointer-events:none}
 .toggle-track input:checked~.toggle-bg{background:var(--a)}
 .toggle-track input:checked~.toggle-thumb{transform:translateX(22px)}
-/* GEN BTN */
 .gbtn{width:100%;padding:16px;background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:var(--r2);color:var(--bg);font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .2s,box-shadow .3s;box-shadow:0 4px 28px var(--gl);margin-top:16px;position:relative;overflow:hidden}
 .gbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%)}
 .gbtn:hover::after{transform:translateX(100%);transition:transform .7s}
@@ -96,8 +94,6 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
 .pgbar{width:100%;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:10px;display:none}
 .pgbar.show{display:block}
 .pgfill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:2px;width:0;transition:width .3s}
-.sep{height:1px;background:var(--bo);margin:14px 0}
-/* GALLERY */
 .gal{margin-top:28px}
 .gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 @media(max-width:480px){.gg{grid-template-columns:1fr}}
@@ -116,7 +112,7 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
 .empty{text-align:center;padding:50px 20px;color:var(--tx3)}
 .empty-ico{font-size:40px;opacity:.25;margin-bottom:14px}
 .empty-t{font-family:'Comfortaa',sans-serif;font-size:12px;line-height:1.7}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--a);color:var(--bg);padding:10px 18px;border-radius:10px;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transform:translateY(60px);opacity:0;transition:transform .4s,opacity .4s;z-index:999;pointer-events:none}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--a);color:var(--bg);padding:10px 18px;border-radius:10px;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transform:translateY(60px);opacity:0;transition:transform .4s,opacity .4s;z-index:9998;pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}
 </style>
 </head>
@@ -142,8 +138,9 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
     <div class="blk">
       <div class="lbl">Фото</div>
       <input type="file" id="files" webkitdirectory multiple accept="image/*">
-      <div class="fz" id="fz" onclick="document.getElementById('files').click()"
-           ondragover="evDrag(event,true)" ondragleave="evDrag(event,false)" ondrop="evDrop(event)">
+      <div class="fz" id="fz"
+        onclick="document.getElementById('files').click()"
+        ondragover="evDrag(event,true)" ondragleave="evDrag(event,false)" ondrop="evDrop(event)">
         <div class="fz-ico">🖼</div>
         <div class="fz-txt">Натисни або перетягни фото<br>підтримка директорій</div>
         <div class="fz-cnt" id="fcnt"></div>
@@ -152,8 +149,12 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
 
     <!-- TEXTS -->
     <div class="blk">
-      <div class="lbl">Текст (/// між фото)</div>
-      <textarea id="textsTop" rows="4" placeholder="Текст 1///Текст 2///Текст 3" oninput="updatePreview()"></textarea>
+      <div class="lbl">Текст (розділяй через ///)</div>
+      <div style="font-size:10px;color:var(--tx3);font-family:'Comfortaa',sans-serif;margin-bottom:8px;line-height:1.6">
+        Фото 1 → перший текст<br>Фото 2 → другий текст і т.д.<br>
+        <span style="color:var(--a)">Приклад: Текст 1///Текст 2///Текст 3</span>
+      </div>
+      <textarea id="textsTop" rows="5" placeholder="Текст 1///Текст 2///Текст 3" oninput="updatePreview()"></textarea>
     </div>
 
     <!-- FONT -->
@@ -162,7 +163,7 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
       <div class="fg" id="fontGrid"></div>
     </div>
 
-    <!-- SETTINGS -->
+    <!-- FX + WM -->
     <div class="blk">
       <div class="lbl">Ефект для 2-ї копії</div>
       <div class="eprow" id="fxRow">
@@ -175,10 +176,11 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
         <div class="ep" data-fx="cold" onclick="setFx(this)">Cold</div>
       </div>
       <div class="sep"></div>
-      <div class="lbl" style="margin-bottom:8px">Сила ефекту</div>
+      <div class="lbl" style="margin-bottom:4px">Сила ефекту</div>
       <div class="rw">
-        <input type="range" id="fxStr" min="1" max="100" value="10" oninput="document.getElementById('fxV').textContent=this.value;updatePreview()">
-        <span class="rv" id="fxV">5</span>
+        <input type="range" id="fxStr" min="1" max="50" value="10"
+          oninput="document.getElementById('fxV').textContent=this.value;updatePreview()">
+        <span class="rv" id="fxV">10</span>
       </div>
       <div class="sep"></div>
       <div class="lbl">Бренд / Watermark</div>
@@ -191,7 +193,7 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
 
     <!-- LIVE EDITOR -->
     <div class="blk full">
-      <div class="lbl">Живий редактор</div>
+      <div class="lbl">Живий редактор — превью першого фото</div>
       <div class="g2" style="gap:14px">
 
         <div>
@@ -199,16 +201,16 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
             <div class="editor-canvas-wrap">
               <canvas id="edCanvas" width="1080" height="1080"></canvas>
             </div>
-            <div class="handle" id="hTop" style="left:50%;top:10%"></div>
-            <div class="handle-lbl" id="hTopLbl" style="left:50%;top:calc(10% + 14px)">текст</div>
+            <div class="handle" id="hTop"></div>
+            <div class="handle-lbl" id="hTopLbl">текст</div>
           </div>
-          <div style="font-size:9px;color:var(--tx3);font-family:'Comfortaa',sans-serif;margin-top:8px;text-align:center">Перетягуй маркер щоб змінити позицію тексту</div>
+          <div style="font-size:9px;color:var(--tx3);font-family:'Comfortaa',sans-serif;margin-top:8px;text-align:center" id="handleHint"></div>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:12px">
 
           <div>
-            <div class="lbl">Колір тексту (ручний режим)</div>
+            <div class="lbl">Колір (ручний режим)</div>
             <div class="cprow">
               <div class="cpitem">
                 <input type="color" id="topColor" value="#000000" oninput="updatePreview()">
@@ -260,25 +262,28 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
           </div>
 
           <div>
-            <div class="lbl">Фото для редактора</div>
             <input type="file" id="prevFile" accept="image/*" style="display:none" onchange="loadPrevImg(this)">
-            <button class="db" style="width:100%;margin-top:4px;padding:10px" onclick="document.getElementById('prevFile').click()">Завантажити фото</button>
+            <button class="db" style="width:100%;padding:10px" onclick="document.getElementById('prevFile').click()">
+              🖼 Завантажити фото для редактора
+            </button>
           </div>
 
         </div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /g2 -->
 
   <!-- AUTO TOGGLE -->
-  <div class="auto-wrap" style="margin-top:16px">
+  <div class="auto-wrap">
     <div>
       <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:4px">✦ Авто-режим</div>
-      <div style="font-size:10px;color:var(--tx3);font-family:'Comfortaa',sans-serif;line-height:1.5">Текст, розмір панелі та позиція підлаштовуються автоматично під фото</div>
+      <div style="font-size:10px;color:var(--tx3);font-family:'Comfortaa',sans-serif;line-height:1.5">
+        Розмір тексту і панель підлаштовуються автоматично під кожне фото
+      </div>
     </div>
     <label class="toggle-track">
-      <input type="checkbox" id="autoToggle" checked onchange="updatePreview()">
+      <input type="checkbox" id="autoToggle" checked onchange="onAutoChange()">
       <div class="toggle-bg"></div>
       <div class="toggle-thumb"></div>
     </label>
@@ -290,7 +295,7 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
   <div class="gal" id="galOut">
     <div class="empty">
       <div class="empty-ico">✦</div>
-      <div class="empty-t">Завантаж фото і натисни «Згенерувати»</div>
+      <div class="empty-t">Завантаж фото і натисни «Згенерувати»<br>Отримаєш оригінал + версію з ефектом</div>
     </div>
   </div>
 </div>
@@ -298,13 +303,15 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--bo);border-radiu
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== STATE =====
+// ==============================
+// STATE
+// ==============================
 const FONTS=[
-  {name:'Unbounded',lbl:'Unbounded'},
-  {name:'Playfair Display',lbl:'Playfair'},
+  {name:'Unbounded',   lbl:'Unbounded'},
+  {name:'Playfair Display', lbl:'Playfair'},
   {name:'Cormorant Garamond',lbl:'Cormorant'},
-  {name:'Comfortaa',lbl:'Comfortaa'},
-  {name:'Bad Script',lbl:'Bad Script'},
+  {name:'Comfortaa',   lbl:'Comfortaa'},
+  {name:'Bad Script',  lbl:'Bad Script'},
 ];
 let selFont='Unbounded';
 let selFx='none';
@@ -317,12 +324,15 @@ let canvasCache=[];
 let prevImg=null;
 let posTop={x:0.5,y:0.10};
 
-// ===== FONT GRID =====
+// ==============================
+// FONT GRID
+// ==============================
 const fg=document.getElementById('fontGrid');
 FONTS.forEach(f=>{
   const d=document.createElement('div');
   d.className='fo'+(f.name===selFont?' sel':'');
-  d.innerHTML=`<div class="fo-nm" style="font-family:'${f.name}',serif">${f.lbl}</div><div class="fo-lb">${f.lbl}</div>`;
+  d.innerHTML=`<div class="fo-nm" style="font-family:'${f.name}',serif">${f.lbl}</div>`+
+              `<div class="fo-lb">${f.lbl}</div>`;
   d.onclick=()=>{
     selFont=f.name;
     fg.querySelectorAll('.fo').forEach(x=>x.classList.remove('sel'));
@@ -332,34 +342,49 @@ FONTS.forEach(f=>{
   fg.appendChild(d);
 });
 
-// ===== FILES =====
+// ==============================
+// FILE HANDLING
+// ==============================
 document.getElementById('files').addEventListener('change',e=>{
   files=[...e.target.files];
   document.getElementById('fcnt').textContent=files.length?`${files.length} фото вибрано`:'';
-  if(files.length&&!prevImg) loadFileAsImg(files[0],img=>{prevImg=img;updatePreview()});
+  // always reload preview from first file
+  if(files.length) loadFileAsImg(files[0],img=>{prevImg=img;updatePreview();});
 });
-function evDrag(e,on){e.preventDefault();document.getElementById('fz').classList.toggle('drag',on)}
+function evDrag(e,on){
+  e.preventDefault();
+  document.getElementById('fz').classList.toggle('drag',on);
+}
 function evDrop(e){
-  e.preventDefault();document.getElementById('fz').classList.remove('drag');
+  e.preventDefault();
+  document.getElementById('fz').classList.remove('drag');
   files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
   document.getElementById('fcnt').textContent=files.length?`${files.length} фото`:'';
-  if(files.length&&!prevImg) loadFileAsImg(files[0],img=>{prevImg=img;updatePreview()});
+  if(files.length) loadFileAsImg(files[0],img=>{prevImg=img;updatePreview();});
 }
 function loadFileAsImg(file,cb){
-  const img=new Image();img.src=URL.createObjectURL(file);img.onload=()=>cb(img);
+  const img=new Image();
+  img.onload=()=>cb(img);
+  img.src=URL.createObjectURL(file);
 }
 function loadPrevImg(inp){
-  if(!inp.files[0])return;
-  loadFileAsImg(inp.files[0],img=>{prevImg=img;updatePreview()});
+  if(!inp.files[0]) return;
+  loadFileAsImg(inp.files[0],img=>{prevImg=img;updatePreview();});
 }
 
-// ===== THEME =====
+// ==============================
+// THEME
+// ==============================
 function setTheme(t){
   document.documentElement.setAttribute('data-theme',t);
-  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.dataset.t===(t||'gold')));
+  document.querySelectorAll('.tb').forEach(b=>
+    b.classList.toggle('on',b.dataset.t===(t||'gold'))
+  );
 }
 
-// ===== CONTROLS — use explicit group IDs, no .closest() =====
+// ==============================
+// CONTROLS — all use explicit group IDs
+// ==============================
 function setFx(el){
   selFx=el.dataset.fx;
   document.querySelectorAll('#fxRow .ep').forEach(x=>x.classList.remove('on'));
@@ -384,125 +409,187 @@ function setAl(el){
   el.classList.add('on');
   updatePreview();
 }
+function onAutoChange(){
+  const isAuto=document.getElementById('autoToggle').checked;
+  const h=document.getElementById('hTop');
+  const hl=document.getElementById('hTopLbl');
+  const hint=document.getElementById('handleHint');
+  h.style.display=isAuto?'none':'block';
+  hl.style.display=isAuto?'none':'block';
+  hint.textContent=isAuto?'':'Перетягуй маркер щоб змінити позицію тексту';
+  updatePreview();
+}
 
-// ===== WATERMARK =====
+// ==============================
+// WATERMARK
+// ==============================
 function addWm(){
   const inp=document.getElementById('wmInput');
-  const v=inp.value.trim();if(!v)return;
-  if(!watermarks.includes(v)){watermarks.push(v);renderWmTags();}
-  inp.value='';updatePreview();
+  const v=inp.value.trim();
+  if(!v) return;
+  if(!watermarks.includes(v)){ watermarks.push(v); renderWmTags(); }
+  inp.value='';
+  updatePreview();
 }
-function removeWm(i){watermarks.splice(i,1);renderWmTags();updatePreview();}
+function removeWm(idx){
+  watermarks.splice(idx,1);
+  renderWmTags();
+  updatePreview();
+}
 function renderWmTags(){
-  const w=document.getElementById('wmWrap');w.innerHTML='';
+  const w=document.getElementById('wmWrap');
+  w.innerHTML='';
   watermarks.forEach((m,i)=>{
-    const t=document.createElement('div');t.className='wmt';
-    const span=document.createElement('span');
-    span.textContent='×';
-    span.style.cssText='opacity:.6;cursor:pointer;font-size:16px;font-weight:bold;padding:0 2px;line-height:1';
-    span.addEventListener('click',()=>removeWm(i));
-    t.appendChild(document.createTextNode(m+' '));
-    t.appendChild(span);
-    w.appendChild(t);
+    const tag=document.createElement('div');
+    tag.className='wmt';
+    tag.textContent=m+' ';
+    const x=document.createElement('span');
+    x.className='wmt-x';
+    x.textContent='×';
+    x.onclick=()=>removeWm(i);
+    tag.appendChild(x);
+    w.appendChild(tag);
   });
 }
 
-// ===== CANVAS HELPERS =====
+// ==============================
+// TEXT SPLIT HELPER
+// Handles: "a///b///c", "a/// b ///c", "a\n///\nb\n///\nc"
+// ==============================
+function splitTexts(raw){
+  return raw.split('///').map(t=>t.replace(/^\s+|\s+$/g,''));
+}
+
+// ==============================
+// CANVAS HELPERS
+// ==============================
 function smartWrap(ctx,text,maxW){
-  const words=text.split(' ');let lines=[''];
-  for(const w of words){
-    const test=(lines[lines.length-1]+' '+w).trim();
-    if(ctx.measureText(test).width>maxW) lines.push(w);
+  const words=text.split(' ');
+  let lines=[''];
+  for(const word of words){
+    const test=(lines[lines.length-1]+' '+word).trim();
+    if(ctx.measureText(test).width>maxW) lines.push(word);
     else lines[lines.length-1]=test;
   }
   return lines.filter(l=>l.trim());
 }
 
 function autoFontSize(ctx,text,font,weight,maxW){
-  let s=120;
-  while(s>24){
+  for(let s=120;s>=24;s-=2){
     ctx.font=`${weight} ${s}px "${font}"`;
     if(ctx.measureText(text).width<maxW) return s;
-    s-=2;
   }
   return 24;
 }
 
-// Analyze brightness of a horizontal strip of the image (0..1 coords)
-function stripBrightness(img,yStart,yEnd){
+// Analyze average brightness of a horizontal strip (yFrom..yTo in 0..1)
+function stripBrightness(img,yFrom,yTo){
   if(!img) return 200;
-  const tmp=document.createElement('canvas');
-  tmp.width=40;tmp.height=40;
+  const W=40,H=40;
+  const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;
   const tc=tmp.getContext('2d');
   const ih=img.naturalHeight||1080;
   const iw=img.naturalWidth||1080;
-  const sy=yStart*ih, sh=(yEnd-yStart)*ih;
-  tc.drawImage(img,0,sy,iw,sh,0,0,40,40);
-  const d=tc.getImageData(0,0,40,40).data;
+  tc.drawImage(img,0,yFrom*ih,iw,(yTo-yFrom)*ih,0,0,W,H);
+  const d=tc.getImageData(0,0,W,H).data;
   let s=0;
   for(let i=0;i<d.length;i+=4) s+=d[i]*.299+d[i+1]*.587+d[i+2]*.114;
-  return s/(40*40);
+  return s/(W*H);
 }
 
-// Apply image effects
-function applyFx(canvas,ctx,fxType,str){
-  if(fxType==='none') return;
+// ==============================
+// EFFECTS — applied to a SNAPSHOT of the canvas
+// so text + panel + image all get the effect
+// ==============================
+function applyFx(srcCanvas, fxType, str){
+  // returns a NEW canvas with effect applied
+  const out=document.createElement('canvas');out.width=1080;out.height=1080;
+  const ctx=out.getContext('2d');
+
+  if(fxType==='none'){
+    ctx.drawImage(srcCanvas,0,0);
+    return out;
+  }
+
   if(fxType==='pixel'){
-    const blockSize=Math.max(2,str*2); // str 1-100 → block 2-200px
-    const sw=Math.max(1,Math.ceil(1080/blockSize));
-    const sh=Math.max(1,Math.ceil(1080/blockSize));
-    const s=document.createElement('canvas');
-    s.width=sw;s.height=sh;
-    const sc=s.getContext('2d');
+    // block size: str 1..50 → blocks 4..200px
+    const blockPx=Math.max(4,str*4);
+    const sw=Math.max(1,Math.ceil(1080/blockPx));
+    const sh=Math.max(1,Math.ceil(1080/blockPx));
+    const small=document.createElement('canvas');small.width=sw;small.height=sh;
+    const sc=small.getContext('2d');
     sc.imageSmoothingEnabled=false;
-    sc.drawImage(canvas,0,0,1080,1080,0,0,sw,sh);
-    ctx.save();
+    sc.drawImage(srcCanvas,0,0,sw,sh);
     ctx.imageSmoothingEnabled=false;
-    ctx.clearRect(0,0,1080,1080);
-    ctx.drawImage(s,0,0,sw,sh,0,0,1080,1080);
-    ctx.restore();
-    return;
+    ctx.drawImage(small,0,0,sw,sh,0,0,1080,1080);
+    return out;
   }
+
   if(fxType==='blur'){
+    // draw first, then filter-redraw via offscreen snapshot
     const radius=Math.max(1,str*3);
-    // snapshot current canvas into an image
-    const snap=new Image();
-    snap.src=canvas.toDataURL();
-    // sync draw trick: snap is already loaded since toDataURL is sync
     ctx.filter=`blur(${radius}px)`;
-    // draw slightly oversized to avoid edge fading from blur
-    ctx.clearRect(0,0,1080,1080);
-    ctx.drawImage(canvas,-radius*2,-radius*2,1080+radius*4,1080+radius*4);
+    // extend draw beyond bounds to avoid edge fade
+    const pad=radius*2;
+    ctx.drawImage(srcCanvas,-pad,-pad,1080+pad*2,1080+pad*2);
     ctx.filter='none';
-    return;
+    return out;
   }
-  const id=ctx.getImageData(0,0,1080,1080);const d=id.data;
+
+  // pixel-manipulation effects
+  ctx.drawImage(srcCanvas,0,0);
+  const id=ctx.getImageData(0,0,1080,1080);
+  const d=id.data;
+
   if(fxType==='bw'){
-    for(let i=0;i<d.length;i+=4){const g=d[i]*.299+d[i+1]*.587+d[i+2]*.114;d[i]=d[i+1]=d[i+2]=g;}
-  }
-  if(fxType==='warm'){
-    for(let i=0;i<d.length;i+=4){d[i]=Math.min(255,d[i]+str*1.5);d[i+2]=Math.max(0,d[i+2]-str*.8);}
-  }
-  if(fxType==='cold'){
-    for(let i=0;i<d.length;i+=4){d[i+2]=Math.min(255,d[i+2]+str*1.5);d[i]=Math.max(0,d[i]-str*.8);}
-  }
-  if(fxType==='vignette'){
+    for(let i=0;i<d.length;i+=4){
+      const g=d[i]*.299+d[i+1]*.587+d[i+2]*.114;
+      d[i]=d[i+1]=d[i+2]=g;
+    }
     ctx.putImageData(id,0,0);
-    const g=ctx.createRadialGradient(540,540,200,540,540,760);
-    g.addColorStop(0,'transparent');g.addColorStop(1,`rgba(0,0,0,${str/20})`);
-    ctx.fillStyle=g;ctx.fillRect(0,0,1080,1080);return;
   }
-  ctx.putImageData(id,0,0);
+  else if(fxType==='warm'){
+    for(let i=0;i<d.length;i+=4){
+      d[i]=Math.min(255,d[i]+str*2);
+      d[i+2]=Math.max(0,d[i+2]-str);
+    }
+    ctx.putImageData(id,0,0);
+  }
+  else if(fxType==='cold'){
+    for(let i=0;i<d.length;i+=4){
+      d[i+2]=Math.min(255,d[i+2]+str*2);
+      d[i]=Math.max(0,d[i]-str);
+    }
+    ctx.putImageData(id,0,0);
+  }
+  else if(fxType==='vignette'){
+    ctx.putImageData(id,0,0);
+    const intensity=Math.min(0.95, str/50);
+    const g=ctx.createRadialGradient(540,540,180,540,540,780);
+    g.addColorStop(0,'rgba(0,0,0,0)');
+    g.addColorStop(1,`rgba(0,0,0,${intensity})`);
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,1080,1080);
+  }
+
+  return out;
 }
 
-// ===== DRAW TEXT with shadow/stroke/glow =====
+// ==============================
+// DRAW TEXT LINE with shadow/stroke/glow
+// ==============================
 function drawTextLine(ctx,text,x,y,sz,color){
   ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
-  if(selSh==='soft'){ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=sz*.2;ctx.shadowOffsetY=2;}
-  if(selSh==='hard'){ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=2;ctx.shadowOffsetX=3;ctx.shadowOffsetY=3;}
-  if(selSh==='glow'){ctx.shadowColor='rgba(255,210,60,0.7)';ctx.shadowBlur=sz*.4;}
-  if(selSh==='stroke'){
-    ctx.strokeStyle='rgba(0,0,0,0.6)';ctx.lineWidth=Math.max(2,sz/20);ctx.lineJoin='round';
+  if(selSh==='soft'){
+    ctx.shadowColor='rgba(0,0,0,0.65)';ctx.shadowBlur=sz*.2;ctx.shadowOffsetY=2;
+  } else if(selSh==='hard'){
+    ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=2;ctx.shadowOffsetX=3;ctx.shadowOffsetY=3;
+  } else if(selSh==='glow'){
+    ctx.shadowColor='rgba(255,210,60,0.8)';ctx.shadowBlur=sz*.45;
+  } else if(selSh==='stroke'){
+    ctx.strokeStyle='rgba(0,0,0,0.7)';
+    ctx.lineWidth=Math.max(2,sz/18);
+    ctx.lineJoin='round';
     ctx.strokeText(text,x,y);
     ctx.shadowColor='transparent';ctx.shadowBlur=0;
   }
@@ -511,246 +598,291 @@ function drawTextLine(ctx,text,x,y,sz,color){
   ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
 }
 
-// ===== MAIN RENDER =====
-function renderImage(img,textTop,wmStr,fxType,fxStr,overrideAuto){
-  const c=document.createElement('canvas');c.width=1080;c.height=1080;
-  const ctx=c.getContext('2d');
+// ==============================
+// MAIN RENDER — returns canvas 1080×1080
+// isAuto: true = auto mode, false = manual
+// ==============================
+function renderImage(img, textTop, wmStr, fxType, fxStr, isAuto){
+  const base=document.createElement('canvas');base.width=1080;base.height=1080;
+  const ctx=base.getContext('2d');
 
-  const isAuto=overrideAuto!==undefined?overrideAuto:document.getElementById('autoToggle').checked;
   const weight=selW==='normal'?'normal':selW==='bold'?'bold':'900';
-  const hasText=textTop&&textTop.trim();
+  const hasText=!!(textTop&&textTop.trim());
 
-  // Draw full image
+  // 1. Draw image full canvas
   if(img) ctx.drawImage(img,0,0,1080,1080);
-  else{ctx.fillStyle='#f5f5f5';ctx.fillRect(0,0,1080,1080);}
+  else { ctx.fillStyle='#f0f0f0'; ctx.fillRect(0,0,1080,1080); }
 
+  // 2. Draw text panel
   if(hasText){
     const manualSize=parseInt(document.getElementById('topSize').value)||0;
 
-    // Font size
+    // font size
     let sz;
     if(isAuto){
       const len=textTop.trim().length;
-      sz = len<=12?130 : len<=25?108 : len<=45?88 : len<=75?68 : len<=110?52 : 40;
+      sz = len<=10?130 : len<=20?110 : len<=35?90 : len<=55?74 : len<=80?58 : len<=110?46 : 36;
     } else {
-      sz=manualSize>0?manualSize:autoFontSize(ctx,textTop,selFont,weight,920);
+      sz = manualSize>0 ? manualSize : autoFontSize(ctx,textTop,selFont,weight,920);
     }
     sz=Math.max(sz,26);
 
     ctx.font=`${weight} ${sz}px "${selFont}"`;
     const lines=smartWrap(ctx,textTop,920);
-    const lh=sz*1.25;
-    const textBlockH=lines.length*lh;
+    const lh=sz*1.28;
+    const padTop=sz*0.75;
+    const padBot=sz*0.65;
+    const panelH=Math.ceil(padTop + lines.length*lh + padBot);
 
-    // Panel height: text block + padding top + padding bottom
-    const padTop=sz*0.7;
-    const padBot=sz*0.6;
-    const panelH=Math.round(padTop+textBlockH+padBot);
-
-    // Auto: detect best placement (top or bottom based on brightness)
+    // panel Y position
     let panelY;
     if(isAuto){
-      const topBr=stripBrightness(img,0,panelH/1080);
-      const botBr=stripBrightness(img,(1080-panelH)/1080,1);
-      // place on whichever side is lighter (white panel blends better on light bg)
-      // actually: always white panel so just pick top since that's the original style
-      // but if top is very busy (dark), push to top still — it's a white panel so always readable
-      panelY=0; // white panel always at top like original
+      panelY=0; // always top, like original
     } else {
-      // Manual: position controlled by drag handle — panel centered on handle Y
       const cy=Math.round(1080*posTop.y);
-      panelY=Math.max(0,Math.min(1080-panelH,cy-panelH/2));
+      panelY=Math.max(0,Math.min(1080-panelH,cy-Math.round(panelH/2)));
     }
 
-    // Auto-size panel based on actual content — already done via panelH
-    // Draw white panel
+    // draw panel
     const panelColor=isAuto?'#ffffff':document.getElementById('panelColor').value;
     ctx.fillStyle=panelColor;
     ctx.fillRect(0,panelY,1080,panelH);
 
-    // Draw text
+    // draw text lines
     const textColor=isAuto?'#000000':document.getElementById('topColor').value;
     const xPos=selAl==='center'?540:selAl==='left'?80:1000;
     ctx.font=`${weight} ${sz}px "${selFont}"`;
     ctx.textAlign=selAl;
-    let y=panelY+padTop+sz*0.85;
-    for(const l of lines){
-      drawTextLine(ctx,l.trim(),xPos,y,sz,textColor);
+    let y=panelY+padTop+sz*0.82;
+    for(const line of lines){
+      drawTextLine(ctx,line,xPos,y,sz,textColor);
       y+=lh;
     }
   }
 
-  // Watermark
+  // 3. Draw watermark (always on top, before FX so it also gets pixelated)
   if(wmStr){
-    ctx.font='bold 36px "Unbounded"';ctx.textAlign='center';
-    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=14;
-    ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=8;
+    ctx.font='bold 36px "Unbounded"';
+    ctx.textAlign='center';
+    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=14;
+    ctx.strokeStyle='rgba(0,0,0,0.9)';ctx.lineWidth=9;
     ctx.strokeText(wmStr,540,1054);
-    ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText(wmStr,540,1054);
+    ctx.fillStyle='rgba(255,255,255,0.93)';
+    ctx.fillText(wmStr,540,1054);
     ctx.shadowColor='transparent';ctx.shadowBlur=0;
   }
 
-  // Apply FX to entire canvas (image + text + panel)
-  applyFx(c,ctx,fxType,fxStr);
-
-  return c;
+  // 4. Apply FX — returns a NEW canvas (snapshot approach, no self-draw issues)
+  return applyFx(base, fxType, fxStr);
 }
 
-// ===== LIVE PREVIEW =====
+// ==============================
+// LIVE PREVIEW
+// ==============================
 function updatePreview(){
-  const textTop=(document.getElementById('textsTop').value.split(/\/\/\/\s*/)[0]||'').trim();
-  const wm=watermarks[0]||'';
-  const fxS=parseInt(document.getElementById('fxStr').value);
+  const raw=document.getElementById('textsTop').value;
+  const texts=splitTexts(raw);
+  const textTop=texts[0]||'';
+  const wm=watermarks.length?watermarks[0]:'';
+  const fxS=parseInt(document.getElementById('fxStr').value)||10;
   const isAuto=document.getElementById('autoToggle').checked;
 
   const c=renderImage(prevImg,textTop,wm,'none',fxS,isAuto);
   const dest=document.getElementById('edCanvas');
-  dest.getContext('2d').clearRect(0,0,1080,1080);
-  dest.getContext('2d').drawImage(c,0,0);
-  updateHandleVis(isAuto);
-}
+  const dctx=dest.getContext('2d');
+  dctx.clearRect(0,0,1080,1080);
+  dctx.drawImage(c,0,0);
 
-// Show/hide drag handle based on auto mode
-function updateHandleVis(isAuto){
-  const h=document.getElementById('hTop');
-  const hl=document.getElementById('hTopLbl');
-  h.style.display=isAuto?'none':'block';
-  hl.style.display=isAuto?'none':'block';
+  // update handle position if visible
   if(!isAuto) updateHandlePos();
 }
+
 function updateHandlePos(){
-  const hT=document.getElementById('hTop');
-  const lT=document.getElementById('hTopLbl');
-  hT.style.left=(posTop.x*100)+'%';hT.style.top=(posTop.y*100)+'%';
-  lT.style.left=(posTop.x*100)+'%';lT.style.top='calc('+(posTop.y*100)+'% + 14px)';
+  const h=document.getElementById('hTop');
+  const hl=document.getElementById('hTopLbl');
+  h.style.left=(posTop.x*100)+'%';
+  h.style.top=(posTop.y*100)+'%';
+  hl.style.left=(posTop.x*100)+'%';
+  hl.style.top='calc('+(posTop.y*100)+'% + 14px)';
 }
 
 // Drag handle
-function makeDraggable(handleId,posObj){
-  const el=document.getElementById(handleId);
+(function(){
+  const el=document.getElementById('hTop');
   let drag=false;
   function getPos(e){
     const r=document.getElementById('edWrap').getBoundingClientRect();
     const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
     const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
-    posObj.x=Math.max(0,Math.min(1,cx/r.width));
-    posObj.y=Math.max(0,Math.min(1,cy/r.height));
+    posTop.x=Math.max(0,Math.min(1,cx/r.width));
+    posTop.y=Math.max(0,Math.min(1,cy/r.height));
   }
-  el.addEventListener('mousedown',e=>{drag=true;e.preventDefault()});
-  el.addEventListener('touchstart',e=>{drag=true;e.preventDefault()},{passive:false});
+  el.addEventListener('mousedown',e=>{drag=true;e.preventDefault();});
+  el.addEventListener('touchstart',e=>{drag=true;e.preventDefault();},{passive:false});
   document.addEventListener('mousemove',e=>{if(!drag)return;getPos(e);updatePreview();});
   document.addEventListener('touchmove',e=>{if(!drag)return;getPos(e);updatePreview();},{passive:false});
   document.addEventListener('mouseup',()=>drag=false);
   document.addEventListener('touchend',()=>drag=false);
-}
-makeDraggable('hTop',posTop);
+})();
 
-// ===== GENERATE =====
+// ==============================
+// GENERATE
+// ==============================
 async function generate(){
-  if(!files.length){toast('Спочатку вибери фото');return;}
-  const textsTop=document.getElementById('textsTop').value.split(/\/\/\/\s*/).map(t=>t.trim());
+  if(!files.length){ toast('Спочатку вибери фото'); return; }
+
+  const raw=document.getElementById('textsTop').value;
+  const texts=splitTexts(raw); // ["текст1","текст2","текст3"]
+
   const wms=watermarks.length?watermarks:[''];
-  const fxS=parseInt(document.getElementById('fxStr').value);
+  const fxS=parseInt(document.getElementById('fxStr').value)||10;
   const isAuto=document.getElementById('autoToggle').checked;
-  const fxForCopy=selFx==='none'&&isAuto?'vignette':selFx;
-  const fxLbl=selFx==='none'&&isAuto?'soft':selFx==='none'?'copy':selFx;
+  const fxForCopy=(selFx==='none'&&isAuto)?'vignette':selFx;
+  const fxLbl=(selFx==='none'&&isAuto)?'soft':selFx==='none'?'copy':selFx;
 
   const btn=document.getElementById('genBtn');
-  const pg=document.getElementById('pg');const pgf=document.getElementById('pgf');
-  btn.disabled=true;pg.classList.add('show');canvasCache=[];
+  const pg=document.getElementById('pg');
+  const pgf=document.getElementById('pgf');
+  btn.disabled=true;
+  pg.classList.add('show');
+  canvasCache=[];
 
   const out=document.getElementById('galOut');
-  out.innerHTML=`<div style="font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--tx3);margin-bottom:16px" id="galTitle">Генерація...</div><div style="display:none;margin-bottom:14px" id="galZipRow"><button class="db pr" id="zipBtn" style="padding:10px 20px;font-size:10px">↓ Завантажити всі ZIP</button></div><div class="gg" id="gg"></div>`;
+  out.innerHTML=
+    `<div id="galTitle" style="font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--tx3);margin-bottom:16px">Генерація...</div>`+
+    `<div id="galZipRow" style="display:none;margin-bottom:14px"><button class="db pr" id="zipBtn" style="padding:10px 20px;font-size:10px">↓ Завантажити всі ZIP</button></div>`+
+    `<div class="gg" id="gg"></div>`;
   const gg=document.getElementById('gg');
 
   for(let i=0;i<files.length;i++){
     pgf.style.width=((i/files.length)*100)+'%';
-    await new Promise(r=>setTimeout(r,0));
-    const img=await new Promise(r=>{const m=new Image();m.src=URL.createObjectURL(files[i]);m.onload=()=>r(m);m.onerror=()=>r(null);});
+    await new Promise(r=>setTimeout(r,0)); // let UI breathe
+
+    const img=await new Promise(r=>{
+      const m=new Image();
+      m.onload=()=>r(m);
+      m.onerror=()=>r(null);
+      m.src=URL.createObjectURL(files[i]);
+    });
     if(!img) continue;
 
-    const tt=(textsTop[i]||'').trim();
+    // texts[i] — якщо i виходить за межі масиву, '' (порожньо)
+    const tt=texts[i]||'';
     const wm=wms[i%wms.length]||'';
 
-    const base=renderImage(img,tt,wm,'none',fxS,isAuto);
-    const fxCnv=renderImage(img,tt,wm,fxForCopy,fxS,isAuto);
-    const normUrl=base.toDataURL('image/jpeg',0.95);
-    const fxUrl=fxCnv.toDataURL('image/jpeg',0.95);
+    const origCanvas=renderImage(img,tt,wm,'none',fxS,isAuto);
+    const fxCanvas  =renderImage(img,tt,wm,fxForCopy,fxS,isAuto);
+    const origUrl=origCanvas.toDataURL('image/jpeg',0.95);
+    const fxUrl  =fxCanvas.toDataURL('image/jpeg',0.95);
+
     const ci=canvasCache.length;
-    canvasCache.push({base,fx:fxCnv,name:files[i].name});
+    canvasCache.push({orig:origCanvas,fx:fxCanvas,name:files[i].name});
 
     const isMob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const card=document.createElement('div');
-    card.className='card';card.style.animationDelay=(i*.06)+'s';
-    const mobBtns=`<button class="db" onclick="openFull(${ci},'orig')">📱 Orig</button><button class="db pr" onclick="openFull(${ci},'fx')">📱 ${fxLbl}</button>`;
-    const deskBtns=`<button class="db" onclick="dlOne(${ci},'orig')">↓ Orig</button><button class="db pr" onclick="dlOne(${ci},'fx')">↓ ${fxLbl}</button><button class="db" onclick="dlOne(${ci},'both')">↓ Обидва</button>`;
-    card.innerHTML=`<div class="ci"><div class="ch" onclick="${isMob?`openFull(${ci},'orig')`:`dlOne(${ci},'orig')`}"><img src="${normUrl}" loading="lazy" style="aspect-ratio:1;object-fit:cover"><div class="chl">orig</div></div><div class="ch" onclick="${isMob?`openFull(${ci},'fx')`:`dlOne(${ci},'fx')`}"><img src="${fxUrl}" loading="lazy" style="aspect-ratio:1;object-fit:cover"><div class="chl">${fxLbl}</div></div></div><div class="cact">${isMob?mobBtns:deskBtns}</div>`;
+    card.className='card';
+    card.style.animationDelay=(i*.06)+'s';
+
+    const btnOrig=isMob
+      ?`<button class="db"    onclick="openFull(${ci},'orig')">📱 Orig</button>`
+      :`<button class="db"    onclick="dlOne(${ci},'orig')">↓ Orig</button>`;
+    const btnFx=isMob
+      ?`<button class="db pr" onclick="openFull(${ci},'fx')">📱 ${fxLbl}</button>`
+      :`<button class="db pr" onclick="dlOne(${ci},'fx')">↓ ${fxLbl}</button>`;
+    const btnBoth=isMob?''
+      :`<button class="db"    onclick="dlOne(${ci},'both')">↓ Обидва</button>`;
+
+    card.innerHTML=
+      `<div class="ci">`+
+        `<div class="ch" onclick="${isMob?`openFull(${ci},'orig')`:`dlOne(${ci},'orig')`}">`+
+          `<img src="${origUrl}" loading="lazy" style="aspect-ratio:1;object-fit:cover">`+
+          `<div class="chl">orig</div></div>`+
+        `<div class="ch" onclick="${isMob?`openFull(${ci},'fx')`:`dlOne(${ci},'fx')`}">`+
+          `<img src="${fxUrl}" loading="lazy" style="aspect-ratio:1;object-fit:cover">`+
+          `<div class="chl">${fxLbl}</div></div>`+
+      `</div>`+
+      `<div class="cact">${btnOrig}${btnFx}${btnBoth}</div>`;
+
     gg.appendChild(card);
   }
 
   pgf.style.width='100%';
-  setTimeout(()=>{pg.classList.remove('show');pgf.style.width='0';},600);
+  setTimeout(()=>{ pg.classList.remove('show'); pgf.style.width='0'; },600);
   btn.disabled=false;
 
   document.getElementById('galTitle').textContent=`Готово — ${canvasCache.length} фото`;
-  const zipRow=document.getElementById('galZipRow');
-  if(zipRow&&canvasCache.length){
+
+  if(canvasCache.length){
+    const zipRow=document.getElementById('galZipRow');
     zipRow.style.display='block';
     document.getElementById('zipBtn').onclick=async()=>{
       toast('Пакуємо ZIP...');
       const zip=new JSZip();
       canvasCache.forEach((c,i)=>{
-        zip.file(`${i+1}_orig.jpg`,c.base.toDataURL('image/jpeg',0.95).split(',')[1],{base64:true});
-        zip.file(`${i+1}_fx.jpg`,c.fx.toDataURL('image/jpeg',0.95).split(',')[1],{base64:true});
+        zip.file(`${i+1}_orig.jpg`,c.orig.toDataURL('image/jpeg',0.95).split(',')[1],{base64:true});
+        zip.file(`${i+1}_fx.jpg`,  c.fx.toDataURL('image/jpeg',0.95).split(',')[1],{base64:true});
       });
       const blob=await zip.generateAsync({type:'blob'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='motiv_gallery.zip';a.click();
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='motiv_gallery.zip';
+      a.click();
       toast('✦ ZIP завантажено');
     };
   }
+
   toast(`✦ ${canvasCache.length} фото готово`);
 }
 
+// ==============================
+// DOWNLOAD / OPEN FULL
+// ==============================
 function dlOne(i,which){
-  const c=canvasCache[i];if(!c)return;
+  const c=canvasCache[i]; if(!c) return;
   const base=c.name.replace(/\.[^.]+$/,'')||'motiv';
   function save(canvas,suf){
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/jpeg',0.95);
-    a.download=base+'_'+suf+'.jpg';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    a.download=`${base}_${suf}.jpg`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }
-  if(which==='both'){save(c.base,'orig');setTimeout(()=>save(c.fx,'fx'),300);}
+  if(which==='both'){ save(c.orig,'orig'); setTimeout(()=>save(c.fx,'fx'),300); }
   else if(which==='fx') save(c.fx,'fx');
-  else save(c.base,'orig');
+  else save(c.orig,'orig');
 }
 
 function openFull(i,which){
-  const c=canvasCache[i];if(!c)return;
+  const c=canvasCache[i]; if(!c) return;
   const isMob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if(!isMob){dlOne(i,which||'orig');return;}
-  const canvas=which==='fx'?c.fx:c.base;
+  if(!isMob){ dlOne(i,which||'orig'); return; }
+  const canvas=which==='fx'?c.fx:c.orig;
   const ov=document.createElement('div');
   ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:16px';
   const hint=document.createElement('div');
-  hint.style.cssText='font-family:"Unbounded",sans-serif;font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#C9A84C;text-align:center;line-height:1.7';
-  hint.innerHTML='Затримай палець на фото<br><span style="font-size:9px;color:#6A6058;font-weight:300">→ «Зберегти зображення»</span>';
+  hint.innerHTML='Затримай палець на фото<br><span style="font-size:9px;color:#6A6058">→ «Зберегти зображення»</span>';
+  hint.style.cssText='font-family:Unbounded,sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#C9A84C;text-align:center;line-height:1.8';
   const img=document.createElement('img');
   img.src=canvas.toDataURL('image/jpeg',0.95);
   img.style.cssText='max-width:100%;max-height:70vh;border-radius:12px;display:block';
-  const btn=document.createElement('button');
-  btn.textContent='✕ Закрити';
-  btn.style.cssText='background:transparent;border:1px solid rgba(201,168,76,0.35);border-radius:40px;color:#C9A84C;font-family:"Unbounded",sans-serif;font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;padding:10px 24px;cursor:pointer';
-  btn.onclick=()=>document.body.removeChild(ov);
-  ov.appendChild(hint);ov.appendChild(img);ov.appendChild(btn);
+  const closeBtn=document.createElement('button');
+  closeBtn.textContent='✕ Закрити';
+  closeBtn.style.cssText='background:transparent;border:1px solid rgba(201,168,76,.35);border-radius:40px;color:#C9A84C;font-family:Unbounded,sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:10px 24px;cursor:pointer';
+  closeBtn.onclick=()=>document.body.removeChild(ov);
+  ov.appendChild(hint); ov.appendChild(img); ov.appendChild(closeBtn);
   document.body.appendChild(ov);
 }
 
+// ==============================
+// TOAST
+// ==============================
 function toast(msg){
-  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2400);
 }
 
+// Init
 updatePreview();
 </script>
 </body>
