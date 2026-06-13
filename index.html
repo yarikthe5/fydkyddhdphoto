@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrafRvLv — RVLV Gallery Studio</title>
+<title>MOTIV — AI Gallery Studio</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Comfortaa:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Unbounded:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -306,6 +306,23 @@ input[type=color]{width:40px;height:32px;border:1px solid var(--border);border-r
 
   </div><!-- /g2 -->
 
+  <!-- AUTO MODE TOGGLE -->
+  <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);padding:16px 20px;margin-top:20px;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">✦ Авто-режим</div>
+      <div style="font-size:10px;color:var(--text3);font-family:'Comfortaa',sans-serif;line-height:1.5">Текст сам підлаштовується до фото — розмір, позиція, м'який фон</div>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0">
+      <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--text2);font-family:'Comfortaa',sans-serif">Вимк</div>
+      <div style="position:relative;width:48px;height:26px">
+        <input type="checkbox" id="autoToggle" checked style="position:absolute;opacity:0;width:0;height:0" onchange="updatePreview()">
+        <div id="autoTrack" style="position:absolute;inset:0;border-radius:13px;background:var(--accent);transition:background .3s;cursor:pointer" onclick="document.getElementById('autoToggle').click()"></div>
+        <div id="autoThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .3s;pointer-events:none;transform:translateX(22px)"></div>
+      </div>
+      <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-family:'Comfortaa',sans-serif">Увімк</div>
+    </label>
+  </div>
+
   <button class="gbtn" id="genBtn" onclick="generate()">✦ &nbsp; Згенерувати і завантажити ZIP</button>
   <div class="pgbar" id="pg"><div class="pgfill" id="pgf"></div></div>
 
@@ -480,56 +497,113 @@ function applyFx(canvas,ctx,fxType,str){
 }
 
 // ===== MAIN RENDER FUNCTION (same logic as original) =====
-function renderImage(img, textTop, textBot, bgColorVal, topColorVal, botColorVal, topSizeVal, botSizeVal, wmStr, fxType, fxStr){
+// ===== SMART AUTO LAYOUT =====
+function analyzeStrip(img,yPct,hPct){
+  if(!img)return 128;
+  const tmp=document.createElement('canvas');tmp.width=36;tmp.height=36;
+  const tc=tmp.getContext('2d');
+  const ih=img.naturalHeight||img.height||1080;
+  const iw=img.naturalWidth||img.width||1080;
+  tc.drawImage(img,0,yPct*ih,iw,hPct*ih,0,0,36,36);
+  const d=tc.getImageData(0,0,36,36).data;
+  let s=0;for(let i=0;i<d.length;i+=4)s+=d[i]*.299+d[i+1]*.587+d[i+2]*.114;
+  return s/(36*36);
+}
+function smartLayout(img,text){
+  const tBr=analyzeStrip(img,0,0.22);
+  const bBr=analyzeStrip(img,0.78,0.22);
+  const onTop=tBr<=bBr; // place text on darker side
+  return {onTop, zoneBright:onTop?tBr:bBr};
+}
+
+function renderImage(img,textTop,textBot,bgColorVal,topColorVal,botColorVal,topSizeVal,botSizeVal,wmStr,fxType,fxStr){
   const c=document.createElement('canvas');c.width=1080;c.height=1080;
   const ctx=c.getContext('2d');
 
-  // BG
-  ctx.fillStyle=bgColorVal;ctx.fillRect(0,0,1080,1080);
-
+  const autoEl=document.getElementById('autoToggle');
+  const autoMode=autoEl?autoEl.checked:false;
   const weight=selW==='normal'?'normal':selW==='bold'?'bold':'900';
+  const hasText=textTop&&textTop.trim();
 
-  // --- TOP TEXT (like original: auto-size, wraps, sits at top) ---
-  let topBlockH=0;
-  if(textTop&&textTop.trim()){
+  // Draw full image 1080x1080
+  if(img) ctx.drawImage(img,0,0,1080,1080);
+  else{ctx.fillStyle=bgColorVal;ctx.fillRect(0,0,1080,1080);}
+
+  // Apply FX on image before text
+  applyFx(c,ctx,fxType,fxStr);
+
+  if(hasText){
+    const layout=autoMode?smartLayout(img,textTop):null;
+
+    // font size
     const manualSize=parseInt(topSizeVal);
-    let sz=manualSize>0?manualSize:autoSize(ctx,textTop,selFont,weight);
+    let sz;
+    if(autoMode){
+      const len=textTop.trim().length;
+      sz=len<=15?120:len<=30?96:len<=55?78:len<=90?62:48;
+    } else {
+      sz=manualSize>0?manualSize:autoSize(ctx,textTop,selFont,weight);
+    }
+    sz=Math.max(sz,28);
+
     ctx.font=`${weight} ${sz}px "${selFont}"`;
-    const lines=smartWrap(ctx,textTop,900);
-    const lh=sz+12;
-    topBlockH=lines.length*lh+50;
-    let y=topBlockH/2-((lines.length-1)*lh)/2+sz/3;
-    if(lines.length===1)y=topBlockH/2+sz/3;
+    const lines=smartWrap(ctx,textTop,920);
+    const lh=sz*1.22;
+    const blockH=lines.length*lh+sz*0.5;
 
-    // position override from drag handle
-    const pct=posTop.y;
-    y=1080*pct;
+    // placement
+    let textStartY, scrimY, scrimH, scrimFlipDir;
+    if(autoMode){
+      const onTop=layout.onTop;
+      if(onTop){
+        scrimY=0; scrimH=Math.min(blockH+sz*1.5,400);
+        textStartY=sz*1.1;
+        scrimFlipDir=1; // dark at top, fades down
+      } else {
+        scrimH=Math.min(blockH+sz*1.5,400);
+        scrimY=1080-scrimH;
+        textStartY=scrimY+sz*1.0;
+        scrimFlipDir=-1; // dark at bottom, fades up
+      }
+    } else {
+      textStartY=Math.round(1080*posTop.y);
+      const isTop=posTop.y<0.5;
+      scrimH=Math.min(blockH+sz*1.8,480);
+      scrimY=isTop?Math.max(0,textStartY-sz*0.6):Math.min(1080-scrimH,textStartY-sz*0.4);
+      scrimFlipDir=isTop?1:-1;
+    }
 
+    // White panel behind text
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,scrimY,1080,scrimH);
+
+    // Text
+    const tColor=autoMode?'#000000':(topColorVal||'#ffffff');
+    const xPos=selAl==='center'?540:selAl==='left'?80:1000;
+    ctx.font=`${weight} ${sz}px "${selFont}"`;
+    ctx.textAlign=selAl;
+    let y=textStartY;
     for(const l of lines){
-      let xPos=selAl==='center'?540:selAl==='left'?60:1020;
-      drawText(ctx,l,xPos,y,selFont,weight,sz,topColorVal,selAl,selSh);
+      ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+      if(!autoMode&&selSh==='stroke'){
+        ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=Math.max(2,sz/26);
+        ctx.lineJoin='round';ctx.strokeText(l.trim(),xPos,y);
+      }
+      if(!autoMode&&selSh==='glow'){ctx.shadowColor='rgba(255,210,60,0.65)';ctx.shadowBlur=36;}
+      ctx.fillStyle=tColor;ctx.fillText(l.trim(),xPos,y);
+      ctx.shadowBlur=0;ctx.shadowColor='transparent';
       y+=lh;
     }
   }
 
-  // --- IMAGE (fills area below top text, above bottom text) ---
-  if(img){
-    // reproduce original logic: image starts at topBlockH
-    const imgY=textTop&&textTop.trim()?Math.min(topBlockH+20, 1080*posTop.y+80):0;
-    const imgH=1080-imgY;
-    if(imgH>50)ctx.drawImage(img,0,imgY,1080,imgH);
-  }
-
-  // Apply FX to whole image area BEFORE bottom text
-  applyFx(c,ctx,fxType,fxStr);
-
-
-
-  // --- WATERMARK ---
+  // Watermark
   if(wmStr){
-    ctx.font=`bold 40px "Unbounded"`;ctx.textAlign='center';
-    ctx.strokeStyle='rgba(0,0,0,0.9)';ctx.lineWidth=10;ctx.strokeText(wmStr,540,1052);
-    ctx.fillStyle='rgba(255,255,255,0.85)';ctx.fillText(wmStr,540,1052);
+    ctx.font='bold 36px "Unbounded"';ctx.textAlign='center';
+    ctx.shadowColor='rgba(0,0,0,0.8)';ctx.shadowBlur=14;
+    ctx.strokeStyle='rgba(0,0,0,0.85)';ctx.lineWidth=8;
+    ctx.strokeText(wmStr,540,1054);
+    ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText(wmStr,540,1054);
+    ctx.shadowBlur=0;
   }
 
   return c;
@@ -620,14 +694,16 @@ async function generate(){
     const wm=wms[i%wms.length]||wms[0]||'';
 
     // orig (no fx) + fx copy
+    const autoOn=document.getElementById('autoToggle')&&document.getElementById('autoToggle').checked;
+    const fxForCopy=selFx==='none'&&autoOn?'vignette':selFx;
     const base=renderImage(img,tt,'',bgC,topC,'#ffffff',tsv,50,wm,'none',fxS);
-    const fxCnv=renderImage(img,tt,'',bgC,topC,'#ffffff',tsv,50,wm,selFx,fxS);
+    const fxCnv=renderImage(img,tt,'',bgC,topC,'#ffffff',tsv,50,wm,fxForCopy,fxS);
     const normUrl=base.toDataURL('image/jpeg',0.95);
     const fxUrl=fxCnv.toDataURL('image/jpeg',0.95);
     const ci=canvasCache.length;
     canvasCache.push({base,fx:fxCnv,name:files[i].name});
     const isMob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const fxLbl=selFx==='none'?'copy':selFx;
+    const fxLbl=(selFx==='none'&&autoOn)?'soft':selFx==='none'?'copy':selFx;
     const card=document.createElement('div');
     card.className='card';card.style.animationDelay=(i*.06)+'s';
     const mobBtns=`<button class="db" onclick="openFull(${ci},'orig')">\u{1F4F1} Orig</button><button class="db pr" onclick="openFull(${ci},'fx')">\u{1F4F1} Fx</button>`;
@@ -702,6 +778,12 @@ function toast(msg){
   const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2400);
 }
+
+// Auto toggle visual sync
+document.getElementById('autoToggle').addEventListener('change',function(){
+  document.getElementById('autoThumb').style.transform=this.checked?'translateX(22px)':'translateX(0)';
+  document.getElementById('autoTrack').style.background=this.checked?'var(--accent)':'var(--bg4)';
+});
 
 // Init preview
 updatePreview();
