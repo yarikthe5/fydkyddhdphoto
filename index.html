@@ -2,807 +2,281 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOTIV — AI Gallery Studio</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;700&family=Unbounded:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<title>AI Motivation Gallery</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Cormorant+Garamond:wght@400;600&family=Comfortaa:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --a:#C9A84C;--a2:#E8C96B;--bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--bg4:#222;
-  --bo:rgba(201,168,76,0.18);--bo2:rgba(201,168,76,0.35);
-  --tx:#F0EAD6;--tx2:#9A9082;--tx3:#6A6058;--gl:rgba(201,168,76,0.15);
-  --r:14px;--r2:22px;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f5f5f5;
+  padding: 15px;
 }
-[data-theme="midnight"]{--a:#4FC3F7;--a2:#81D4FA;--bg:#050912;--bg2:#080F1E;--bg3:#0D1628;--bg4:#121D34;--bo:rgba(79,195,247,0.18);--bo2:rgba(79,195,247,0.38);--tx:#DFF0FF;--tx2:#5E8BA8;--tx3:#3A5B70;--gl:rgba(79,195,247,0.12)}
-[data-theme="crimson"]{--a:#D4415A;--a2:#E8637A;--bg:#0A0505;--bg2:#120809;--bg3:#1C0D0E;--bg4:#241213;--bo:rgba(212,65,90,0.2);--bo2:rgba(212,65,90,0.4);--tx:#F5E8E8;--tx2:#8A5A60;--tx3:#5A3A3E;--gl:rgba(212,65,90,0.12)}
-[data-theme="forest"]{--a:#4CAF82;--a2:#6FCFA0;--bg:#030A06;--bg2:#060F09;--bg3:#0A1810;--bg4:#0F2016;--bo:rgba(76,175,130,0.18);--bo2:rgba(76,175,130,0.35);--tx:#E0F5EC;--tx2:#4A8066;--tx3:#2E5540;--gl:rgba(76,175,130,0.12)}
-[data-theme="violet"]{--a:#9B59B6;--a2:#B77FD4;--bg:#07050A;--bg2:#0D0B14;--bg3:#14101E;--bg4:#1C1628;--bo:rgba(155,89,182,0.2);--bo2:rgba(155,89,182,0.38);--tx:#EDE8F5;--tx2:#6A508A;--tx3:#46345E;--gl:rgba(155,89,182,0.12)}
 
-html,body{background:var(--bg);color:var(--tx);font-family:'Unbounded',sans-serif;min-height:100vh;transition:background .5s,color .5s}
+.block {
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 
-/* HEADER */
-.hdr{padding:22px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.logo{font-size:20px;font-weight:900;letter-spacing:.08em;background:linear-gradient(135deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo-sub{display:block;font-size:8px;font-weight:300;letter-spacing:.3em;color:var(--tx3);-webkit-text-fill-color:var(--tx3);margin-top:2px}
-.themes{display:flex;gap:7px}
-.tb{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .2s,border-color .2s}
-.tb:hover{transform:scale(1.2)}.tb.on{border-color:var(--tx)}
-.tb[data-t="gold"]{background:linear-gradient(135deg,#C9A84C,#E8C96B)}
-.tb[data-t="midnight"]{background:linear-gradient(135deg,#1A3A5C,#4FC3F7)}
-.tb[data-t="crimson"]{background:linear-gradient(135deg,#5C1A1A,#D4415A)}
-.tb[data-t="forest"]{background:linear-gradient(135deg,#0A2E14,#4CAF82)}
-.tb[data-t="violet"]{background:linear-gradient(135deg,#1A0A2E,#9B59B6)}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
 
-/* LAYOUT */
-.wrap{padding:20px;max-width:1400px;margin:0 auto}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:720px){.g2{grid-template-columns:1fr}}
-.full{grid-column:1/-1}
+.card {
+  background: #fff;
+  padding: 8px;
+  border-radius: 10px;
+}
 
-/* BLOCKS */
-.blk{background:var(--bg2);border:1px solid var(--bo);border-radius:var(--r2);padding:18px 16px;position:relative;overflow:hidden;transition:background .5s,border .5s}
-.blk::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 10%,var(--gl),transparent 60%);pointer-events:none;opacity:0;transition:opacity .4s}
-.blk:hover::before{opacity:1}
-.lbl{font-size:8px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--a);margin-bottom:10px;display:flex;align-items:center;gap:7px}
-.lbl::before{content:'';display:block;width:14px;height:1px;background:var(--a)}
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
 
-/* INPUTS */
-input[type=file]{display:none}
-.fz{border:1.5px dashed var(--bo2);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;background:var(--bg3)}
-.fz:hover,.fz.drag{border-color:var(--a);background:rgba(201,168,76,.05)}
-.fz-ico{font-size:28px;opacity:.45;margin-bottom:8px}
-.fz-txt{font-size:10px;color:var(--tx2);font-family:'Comfortaa',sans-serif;line-height:1.6}
-.fz-cnt{font-size:11px;font-weight:600;color:var(--a);margin-top:6px;word-break:break-all}
-textarea,input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--bo);border-radius:var(--r);color:var(--tx);font-family:'Comfortaa',sans-serif;font-size:12px;padding:10px 12px;transition:border-color .3s;resize:vertical;outline:none}
-textarea:focus,input[type=text]:focus{border-color:var(--a)}
-textarea{min-height:80px}
+.small {
+  font-size: 12px;
+  color: #666;
+}
 
-/* RANGE */
-.rw{display:flex;align-items:center;gap:12px;margin-top:8px}
-.rv{font-size:13px;font-weight:700;color:var(--a);min-width:36px;text-align:right}
-input[type=range]{flex:1;-webkit-appearance:none;height:2px;background:var(--bg4);border-radius:2px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--a);border:3px solid var(--bg);transition:transform .2s}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input, textarea, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
 
-/* FONT GRID */
-.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-@media(max-width:400px){.fg{grid-template-columns:repeat(2,1fr)}}
-.fo{background:var(--bg3);border:1.5px solid var(--bo);border-radius:10px;padding:9px 6px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
-.fo:hover{border-color:var(--bo2)}.fo.sel{border-color:var(--a);background:rgba(201,168,76,.07)}
-.fo-nm{font-size:15px;line-height:1.4;color:var(--tx);margin-bottom:3px}
-.fo-lb{font-size:8px;letter-spacing:.2em;color:var(--tx3);text-transform:uppercase;font-family:'Unbounded',sans-serif}
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
 
-/* PILLS */
-.eprow{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
-.ep{background:var(--bg3);border:1px solid var(--bo);border-radius:40px;padding:6px 14px;font-size:10px;font-family:'Comfortaa',sans-serif;color:var(--tx2);cursor:pointer;transition:all .2s;user-select:none}
-.ep:hover{border-color:var(--bo2)}.ep.on{border-color:var(--a);color:var(--a);background:rgba(201,168,76,.08)}
-
-/* WATERMARK */
-.wmw{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.wmt{background:rgba(201,168,76,.07);border:1px solid var(--a);border-radius:40px;padding:5px 12px;font-size:10px;font-family:'Comfortaa',sans-serif;color:var(--a);display:flex;align-items:center;gap:6px}
-.wmt-x{opacity:.6;cursor:pointer;font-size:18px;line-height:1;flex-shrink:0;padding:0 2px}
-.wmt-x:hover{opacity:1;color:#fff}
-.wmir{display:flex;gap:7px;margin-top:8px}
-.wmir input{flex:1}
-.wadd{background:var(--bg4);border:1px solid var(--bo2);border-radius:var(--r);padding:9px 16px;color:var(--a);font-size:18px;cursor:pointer;transition:background .2s;flex-shrink:0}
-.wadd:hover{background:var(--a);color:var(--bg)}
-
-/* COLOR PICKERS */
-.cprow{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
-.cpitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;font-family:'Comfortaa',sans-serif}
-input[type=color]{width:44px;height:34px;border:1px solid var(--bo);border-radius:8px;cursor:pointer;background:none;padding:2px}
-
-/* EDITOR */
-.editor-wrap{position:relative;width:100%;max-width:540px;margin:0 auto}
-.ecw{position:relative;width:100%;aspect-ratio:1;border-radius:var(--r);overflow:hidden;background:#111}
-#edCanvas{width:100%;height:100%;display:block}
-.handle{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--a);border:2px solid #000;box-shadow:0 0 0 3px rgba(0,0,0,.5);transform:translate(-50%,-50%);cursor:grab;touch-action:none;z-index:10;display:none}
-.handle:active{cursor:grabbing}
-.hlbl{position:absolute;transform:translateX(-50%);background:rgba(0,0,0,.75);color:var(--a);font-family:'Unbounded',sans-serif;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:4px;pointer-events:none;white-space:nowrap;display:none}
-
-/* SEP */
-.sep{height:1px;background:var(--bo);margin:14px 0}
-
-/* TOGGLE */
-.auto-wrap{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--bo2);border-radius:var(--r2);padding:16px 20px;gap:16px;flex-wrap:wrap;margin-top:16px}
-.tglw{position:relative;width:48px;height:26px;flex-shrink:0;cursor:pointer;display:block}
-.tglw input{position:absolute;opacity:0;width:0;height:0}
-.tgl-bg{position:absolute;inset:0;border-radius:13px;background:var(--bg4);transition:background .3s}
-.tgl-th{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .3s;pointer-events:none}
-.tglw input:checked~.tgl-bg{background:var(--a)}
-.tglw input:checked~.tgl-th{transform:translateX(22px)}
-
-/* GEN BTN */
-.gbtn{width:100%;padding:16px;background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:var(--r2);color:var(--bg);font-family:'Unbounded',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .2s,box-shadow .3s;box-shadow:0 4px 28px var(--gl);margin-top:16px;position:relative;overflow:hidden}
-.gbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%)}
-.gbtn:hover::after{transform:translateX(100%);transition:transform .7s}
-.gbtn:hover{transform:translateY(-2px);box-shadow:0 8px 36px var(--gl)}
-.gbtn:active{transform:scale(.98)}.gbtn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-/* PROGRESS */
-.pgbar{width:100%;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:10px;display:none}
-.pgbar.show{display:block}
-.pgfill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));width:0;transition:width .3s}
-
-/* GALLERY */
-.gal{margin-top:28px}
-.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-@media(max-width:480px){.gg{grid-template-columns:1fr}}
-.card{background:var(--bg2);border:1px solid var(--bo);border-radius:var(--r2);overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;animation:fu .5s both}
-.card:hover{transform:translateY(-3px);border-color:var(--bo2);box-shadow:0 10px 36px rgba(0,0,0,.4)}
-@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.ci{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bo)}
-.ch{position:relative;overflow:hidden;cursor:pointer}
-.ch img{width:100%;display:block;aspect-ratio:1;object-fit:cover;transition:transform .6s}
-.ch:hover img{transform:scale(1.04)}
-.chl{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);border:1px solid var(--bo);border-radius:5px;padding:3px 9px;font-size:8px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--a)}
-.cact{padding:12px 14px;display:flex;gap:8px;align-items:center;justify-content:flex-end;border-top:1px solid var(--bo)}
-.db{background:var(--bg3);border:1px solid var(--bo);border-radius:7px;padding:6px 12px;font-family:'Unbounded',sans-serif;font-size:8px;font-weight:600;letter-spacing:.12em;color:var(--a);cursor:pointer;transition:all .2s;text-transform:uppercase}
-.db:hover{background:var(--a);color:var(--bg);border-color:var(--a)}
-.db.pr{background:linear-gradient(135deg,var(--a),var(--a2));color:var(--bg);border:none}
-.empty{text-align:center;padding:50px 20px;color:var(--tx3)}
-.empty-ico{font-size:40px;opacity:.25;margin-bottom:14px}
-.empty-t{font-family:'Comfortaa',sans-serif;font-size:12px;line-height:1.7}
-
-/* TOAST */
-.toast{position:fixed;bottom:20px;right:20px;background:var(--a);color:var(--bg);padding:10px 18px;border-radius:10px;font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;transform:translateY(60px);opacity:0;transition:transform .4s,opacity .4s;z-index:9998;pointer-events:none}
-.toast.show{transform:translateY(0);opacity:1}
+button:hover {
+  background: #0056b3;
+}
 </style>
 </head>
+
 <body>
 
-<div class="hdr">
-  <div>
-    <div class="logo">MOTIV<span class="logo-sub">AI Gallery Studio</span></div>
-  </div>
-  <div class="themes">
-    <div class="tb on" data-t="gold"    onclick="setTheme('')"></div>
-    <div class="tb"    data-t="midnight" onclick="setTheme('midnight')"></div>
-    <div class="tb"    data-t="crimson"  onclick="setTheme('crimson')"></div>
-    <div class="tb"    data-t="forest"   onclick="setTheme('forest')"></div>
-    <div class="tb"    data-t="violet"   onclick="setTheme('violet')"></div>
-  </div>
+<div class="block">
+<h3>📁 Фото</h3>
+<input type="file" id="files" webkitdirectory multiple>
 </div>
 
-<div class="wrap">
-  <div class="g2">
-
-    <!-- PHOTOS -->
-    <div class="blk">
-      <div class="lbl">Фото</div>
-      <input type="file" id="fileInput" webkitdirectory multiple accept="image/*">
-      <div class="fz" id="fz"
-        onclick="document.getElementById('fileInput').click()"
-        ondragover="evDrag(event,true)" ondragleave="evDrag(event,false)" ondrop="evDrop(event)">
-        <div class="fz-ico">🖼</div>
-        <div class="fz-txt">Натисни або перетягни фото<br>підтримка директорій</div>
-        <div class="fz-cnt" id="fcnt"></div>
-      </div>
-    </div>
-
-    <!-- TEXTS -->
-    <div class="blk">
-      <div class="lbl">Тексти</div>
-      <div style="font-family:'Comfortaa',sans-serif;font-size:10px;color:var(--tx3);margin-bottom:8px;line-height:1.7">
-        Кожен текст на новому рядку або через <span style="color:var(--a);font-weight:700">///</span><br>
-        Рядок 1 → фото 1 &nbsp;|&nbsp; Рядок 2 → фото 2 &nbsp;...
-      </div>
-      <textarea id="txArea" rows="6" placeholder="Мій перший текст&#10;Мій другий текст&#10;Мій третій текст" oninput="updatePreview()"></textarea>
-    </div>
-
-    <!-- FONT -->
-    <div class="blk">
-      <div class="lbl">Шрифт</div>
-      <div class="fg" id="fontGrid"></div>
-    </div>
-
-    <!-- EFFECTS + WM -->
-    <div class="blk">
-      <div class="lbl">Ефект для 2-ї копії</div>
-      <div class="eprow" id="fxRow">
-        <div class="ep on" data-fx="none"     onclick="pick(this,'fxRow');selFx='none';     updatePreview()">Без ефекту</div>
-        <div class="ep"    data-fx="pixel"    onclick="pick(this,'fxRow');selFx='pixel';    updatePreview()">Піксель</div>
-        <div class="ep"    data-fx="blur"     onclick="pick(this,'fxRow');selFx='blur';     updatePreview()">Blur</div>
-        <div class="ep"    data-fx="vignette" onclick="pick(this,'fxRow');selFx='vignette'; updatePreview()">Віньєтка</div>
-        <div class="ep"    data-fx="bw"       onclick="pick(this,'fxRow');selFx='bw';       updatePreview()">Ч/Б</div>
-        <div class="ep"    data-fx="warm"     onclick="pick(this,'fxRow');selFx='warm';     updatePreview()">Warm</div>
-        <div class="ep"    data-fx="cold"     onclick="pick(this,'fxRow');selFx='cold';     updatePreview()">Cold</div>
-      </div>
-      <div class="sep"></div>
-      <div class="lbl" style="margin-bottom:4px">Сила ефекту</div>
-      <div class="rw">
-        <input type="range" id="fxStr" min="1" max="50" value="10"
-          oninput="document.getElementById('fxV').textContent=this.value;updatePreview()">
-        <span class="rv" id="fxV">10</span>
-      </div>
-      <div class="sep"></div>
-      <div class="lbl">Бренд / Watermark</div>
-      <div class="wmir">
-        <input type="text" id="wmInput" placeholder="@бренд" onkeydown="if(event.key==='Enter')addWm()">
-        <button class="wadd" onclick="addWm()">+</button>
-      </div>
-      <div class="wmw" id="wmWrap"></div>
-    </div>
-
-    <!-- LIVE EDITOR -->
-    <div class="blk full">
-      <div class="lbl">Живий редактор</div>
-      <div class="g2" style="gap:14px">
-
-        <!-- CANVAS -->
-        <div>
-          <div class="editor-wrap" id="edWrap">
-            <div class="ecw">
-              <canvas id="edCanvas" width="1080" height="1080"></canvas>
-            </div>
-            <div class="handle" id="hTop"></div>
-            <div class="hlbl"  id="hTopL">текст</div>
-          </div>
-          <div id="hHint" style="font-size:9px;color:var(--tx3);font-family:'Comfortaa',sans-serif;margin-top:8px;text-align:center"></div>
-        </div>
-
-        <!-- CONTROLS -->
-        <div style="display:flex;flex-direction:column;gap:12px">
-
-          <div>
-            <div class="lbl">Колір (ручний режим)</div>
-            <div class="cprow">
-              <div class="cpitem">
-                <input type="color" id="colText"  value="#000000" oninput="updatePreview()">
-                <span>Текст</span>
-              </div>
-              <div class="cpitem">
-                <input type="color" id="colPanel" value="#ffffff" oninput="updatePreview()">
-                <span>Панель</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="lbl">Розмір тексту</div>
-            <div class="rw">
-              <input type="range" id="szRange" min="0" max="200" value="0"
-                oninput="document.getElementById('szV').textContent=(this.value==0?'Авто':this.value);updatePreview()">
-              <span class="rv" id="szV">Авто</span>
-            </div>
-          </div>
-
-          <div>
-            <div class="lbl">Жирність</div>
-            <div class="eprow" id="wRow">
-              <div class="ep on" onclick="pick(this,'wRow');selW='normal'; updatePreview()">Normal</div>
-              <div class="ep"    onclick="pick(this,'wRow');selW='bold';   updatePreview()">Bold</div>
-              <div class="ep"    onclick="pick(this,'wRow');selW='900';    updatePreview()">Black</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="lbl">Тінь тексту</div>
-            <div class="eprow" id="shRow">
-              <div class="ep on" onclick="pick(this,'shRow');selSh='none';   updatePreview()">Без тіні</div>
-              <div class="ep"    onclick="pick(this,'shRow');selSh='soft';   updatePreview()">М'яка</div>
-              <div class="ep"    onclick="pick(this,'shRow');selSh='hard';   updatePreview()">Чітка</div>
-              <div class="ep"    onclick="pick(this,'shRow');selSh='glow';   updatePreview()">Glow</div>
-              <div class="ep"    onclick="pick(this,'shRow');selSh='stroke'; updatePreview()">Обводка</div>
-            </div>
-          </div>
-
-          <div>
-            <div class="lbl">Вирівнювання</div>
-            <div class="eprow" id="alRow">
-              <div class="ep on" onclick="pick(this,'alRow');selAl='center'; updatePreview()">Центр</div>
-              <div class="ep"    onclick="pick(this,'alRow');selAl='left';   updatePreview()">Ліво</div>
-              <div class="ep"    onclick="pick(this,'alRow');selAl='right';  updatePreview()">Право</div>
-            </div>
-          </div>
-
-          <div>
-            <input type="file" id="prevFile" accept="image/*" style="display:none"
-              onchange="if(this.files[0])loadImg(this.files[0],img=>{prevImg=img;updatePreview()})">
-            <button class="db" style="width:100%;padding:10px;margin-top:4px"
-              onclick="document.getElementById('prevFile').click()">
-              🖼 Фото для редактора
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /g2 -->
-
-  <!-- AUTO TOGGLE -->
-  <div class="auto-wrap">
-    <div>
-      <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:4px">✦ Авто-режим</div>
-      <div style="font-size:10px;color:var(--tx3);font-family:'Comfortaa',sans-serif;line-height:1.5">
-        Розмір тексту і висота панелі підлаштовуються автоматично
-      </div>
-    </div>
-    <label class="tglw">
-      <input type="checkbox" id="autoTgl" checked onchange="onAutoChange()">
-      <div class="tgl-bg"></div>
-      <div class="tgl-th"></div>
-    </label>
-  </div>
-
-  <button class="gbtn" id="genBtn" onclick="generate()">✦ &nbsp; Згенерувати і завантажити ZIP</button>
-  <div class="pgbar" id="pg"><div class="pgfill" id="pgf"></div></div>
-
-  <div class="gal" id="galOut">
-    <div class="empty">
-      <div class="empty-ico">✦</div>
-      <div class="empty-t">Завантаж фото і натисни «Згенерувати»<br>Кожне фото → оригінал + версія з ефектом</div>
-    </div>
-  </div>
+<div class="block">
+<h3>✍️ Тексти (///)</h3>
+<textarea id="texts">Секс///Максім Макакін:///каза плюс максем равно люоф</textarea>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="block">
+<h3>🇺🇦 Шрифт</h3>
+<select id="font">
+<option value="Unbounded">Unbounded</option>
+<option value="Playfair Display">Playfair Display</option>
+<option value="Cormorant Garamond">Cormorant</option>
+<option value="Comfortaa">Comfortaa</option>
+<option value="Bad Script">Bad Script</option>
+</select>
+</div>
+
+<div class="block">
+<h3>🧊 Pixel</h3>
+<input type="range" id="pixel" min="1" max="20" value="1">
+</div>
+
+<div class="block">
+<h3>💧 Watermark (через ///)</h3>
+<input id="wm" placeholder="@brand1///@brand2///@brand3">
+</div>
+
+<button onclick="generate()">🚀 Generate Gallery</button>
+
+<div id="gallery"></div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────
-var selFont='Unbounded', selFx='none', selW='normal', selSh='none', selAl='center';
-var files=[], watermarks=[], cache=[], prevImg=null;
-var posTop={x:.5,y:.10};
 
-// ── FONT GRID ──────────────────────────────────────────
-var FONTS=[
-  {n:'Unbounded',        l:'Unbounded'},
-  {n:'Playfair Display', l:'Playfair'},
-  {n:'Cormorant Garamond',l:'Cormorant'},
-  {n:'Comfortaa',        l:'Comfortaa'},
-  {n:'Bad Script',       l:'Bad Script'},
-];
-(function(){
-  var fg=document.getElementById('fontGrid');
-  FONTS.forEach(function(f){
-    var d=document.createElement('div');
-    d.className='fo'+(f.n===selFont?' sel':'');
-    d.innerHTML='<div class="fo-nm" style="font-family:\''+f.n+'\',serif">'+f.l+'</div>'
-               +'<div class="fo-lb">'+f.l+'</div>';
-    d.onclick=function(){
-      selFont=f.n;
-      fg.querySelectorAll('.fo').forEach(function(x){x.classList.remove('sel');});
-      d.classList.add('sel');
-      updatePreview();
-    };
-    fg.appendChild(d);
-  });
-})();
+let files = [];
 
-// ── PILL PICKER (generic) ──────────────────────────────
-function pick(el,rowId){
-  document.querySelectorAll('#'+rowId+' .ep').forEach(function(x){x.classList.remove('on');});
-  el.classList.add('on');
+document.getElementById("files").addEventListener("change", e => {
+    files = [...e.target.files];
+});
+
+// -------- PIXELATE --------
+function pixelate(canvas, ctx, factor) {
+    const w = canvas.width, h = canvas.height;
+
+    let small = document.createElement("canvas");
+    small.width = Math.max(1, Math.floor(w / factor));
+    small.height = Math.max(1, Math.floor(h / factor));
+
+    let sctx = small.getContext("2d");
+
+    sctx.imageSmoothingEnabled = false;
+    sctx.drawImage(canvas, 0, 0, small.width, small.height);
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(small, 0, 0, small.width, small.height, 0, 0, w, h);
 }
 
-// ── THEME ──────────────────────────────────────────────
-function setTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  document.querySelectorAll('.tb').forEach(function(b){
-    b.classList.toggle('on',b.dataset.t===(t||'gold'));
-  });
-}
+// -------- SMART TEXT WRAPPING --------
+function smartWrap(ctx, text, maxWidth) {
+    let words = text.split(" ");
+    let lines = [""];
 
-// ── FILE LOADING ───────────────────────────────────────
-function loadImg(file,cb){
-  var img=new Image();
-  img.onload=function(){cb(img);};
-  img.src=URL.createObjectURL(file);
-}
+    for (let w of words) {
+        let test = lines[lines.length - 1] + " " + w;
 
-function setFiles(list){
-  files=Array.from(list)
-    .filter(function(f){return f.type.startsWith('image/');})
-    .sort(function(a,b){return a.name.localeCompare(b.name,undefined,{numeric:true});});
-  if(!files.length) return;
-  var names=files.slice(0,3).map(function(f){return f.name;}).join(', ')+(files.length>3?'…':'');
-  document.getElementById('fcnt').textContent=files.length+' фото: '+names;
-  loadImg(files[0],function(img){prevImg=img;updatePreview();});
-}
-
-document.getElementById('fileInput').addEventListener('change',function(e){setFiles(e.target.files);});
-function evDrag(e,on){e.preventDefault();document.getElementById('fz').classList.toggle('drag',on);}
-function evDrop(e){
-  e.preventDefault();document.getElementById('fz').classList.remove('drag');
-  setFiles(e.dataTransfer.files);
-}
-
-// ── WATERMARKS ─────────────────────────────────────────
-function addWm(){
-  var inp=document.getElementById('wmInput');
-  var v=inp.value.trim();
-  if(!v) return;
-  if(watermarks.indexOf(v)===-1){watermarks.push(v);renderWmTags();}
-  inp.value='';
-  updatePreview();
-}
-function removeWm(i){
-  watermarks.splice(i,1);
-  renderWmTags();
-  updatePreview();
-}
-function renderWmTags(){
-  var w=document.getElementById('wmWrap');
-  w.innerHTML='';
-  watermarks.forEach(function(m,i){
-    var tag=document.createElement('div');tag.className='wmt';
-    tag.textContent=m+' ';
-    var x=document.createElement('span');x.className='wmt-x';x.textContent='×';
-    x.onclick=(function(idx){return function(){removeWm(idx);};})(i);
-    tag.appendChild(x);w.appendChild(tag);
-  });
-}
-
-// ── AUTO TOGGLE ────────────────────────────────────────
-function onAutoChange(){
-  var isAuto=document.getElementById('autoTgl').checked;
-  var h=document.getElementById('hTop'),hl=document.getElementById('hTopL');
-  h.style.display=isAuto?'none':'block';
-  hl.style.display=isAuto?'none':'block';
-  document.getElementById('hHint').textContent=isAuto?'':'Перетягуй маркер щоб змінити позицію тексту';
-  updatePreview();
-}
-
-// ── TEXT SPLITTING ─────────────────────────────────────
-// Supports BOTH newline and /// as separator
-// "a\nb\nc"  →  ['a','b','c']
-// "a///b///c" → ['a','b','c']
-// "a///\nb"   → ['a','b']
-function getTexts(){
-  var raw=document.getElementById('txArea').value;
-  // first split by ///
-  var parts=raw.split('///');
-  // then each part by newline
-  var result=[];
-  parts.forEach(function(p){
-    p.split('\n').forEach(function(line){
-      var t=line.trim();
-      if(t.length>0) result.push(t);
-    });
-  });
-  return result; // ['text1','text2','text3',...]
-}
-
-// ── CANVAS HELPERS ─────────────────────────────────────
-function wrapText(ctx,text,maxW){
-  var words=text.split(' '), lines=[''];
-  words.forEach(function(w){
-    var test=(lines[lines.length-1]+' '+w).trim();
-    if(ctx.measureText(test).width>maxW) lines.push(w);
-    else lines[lines.length-1]=test;
-  });
-  return lines.filter(function(l){return l.trim().length>0;});
-}
-
-function fitSize(ctx,text,font,weight,maxW){
-  for(var s=120;s>=24;s-=2){
-    ctx.font=weight+' '+s+'px "'+font+'"';
-    if(ctx.measureText(text).width<maxW) return s;
-  }
-  return 24;
-}
-
-// ── EFFECTS ────────────────────────────────────────────
-// Always works on a COPY of srcCanvas, returns new canvas
-function applyFx(src,fxType,str){
-  var out=document.createElement('canvas');out.width=1080;out.height=1080;
-  var ctx=out.getContext('2d');
-
-  if(fxType==='none'){ctx.drawImage(src,0,0);return out;}
-
-  if(fxType==='pixel'){
-    var bpx=Math.max(4,str*4); // str 1-50 → block 4-200px
-    var sw=Math.max(1,Math.ceil(1080/bpx));
-    var sh=Math.max(1,Math.ceil(1080/bpx));
-    var sm=document.createElement('canvas');sm.width=sw;sm.height=sh;
-    var sc=sm.getContext('2d');
-    sc.imageSmoothingEnabled=false;
-    sc.drawImage(src,0,0,sw,sh);       // shrink
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(sm,0,0,sw,sh,0,0,1080,1080); // enlarge → pixel blocks
-    return out;
-  }
-
-  if(fxType==='blur'){
-    var r=Math.max(1,str*3);
-    var pad=r*2;
-    ctx.filter='blur('+r+'px)';
-    ctx.drawImage(src,-pad,-pad,1080+pad*2,1080+pad*2);
-    ctx.filter='none';
-    return out;
-  }
-
-  // pixel-data effects
-  ctx.drawImage(src,0,0);
-  var id=ctx.getImageData(0,0,1080,1080), d=id.data;
-
-  if(fxType==='bw'){
-    for(var i=0;i<d.length;i+=4){var g=d[i]*.299+d[i+1]*.587+d[i+2]*.114;d[i]=d[i+1]=d[i+2]=g;}
-    ctx.putImageData(id,0,0);
-  } else if(fxType==='warm'){
-    for(var i=0;i<d.length;i+=4){d[i]=Math.min(255,d[i]+str*2);d[i+2]=Math.max(0,d[i+2]-str);}
-    ctx.putImageData(id,0,0);
-  } else if(fxType==='cold'){
-    for(var i=0;i<d.length;i+=4){d[i+2]=Math.min(255,d[i+2]+str*2);d[i]=Math.max(0,d[i]-str);}
-    ctx.putImageData(id,0,0);
-  } else if(fxType==='vignette'){
-    ctx.putImageData(id,0,0);
-    var intensity=Math.min(0.92,str/52);
-    var vg=ctx.createRadialGradient(540,540,180,540,540,780);
-    vg.addColorStop(0,'rgba(0,0,0,0)');
-    vg.addColorStop(1,'rgba(0,0,0,'+intensity+')');
-    ctx.fillStyle=vg;ctx.fillRect(0,0,1080,1080);
-  }
-  return out;
-}
-
-// ── DRAW ONE TEXT LINE ─────────────────────────────────
-function drawLine(ctx,text,x,y,sz,color){
-  ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
-  if(selSh==='soft'){ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=sz*.2;ctx.shadowOffsetY=2;}
-  else if(selSh==='hard'){ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=2;ctx.shadowOffsetX=3;ctx.shadowOffsetY=3;}
-  else if(selSh==='glow'){ctx.shadowColor='rgba(255,210,60,0.85)';ctx.shadowBlur=sz*.45;}
-  else if(selSh==='stroke'){
-    ctx.strokeStyle='rgba(0,0,0,0.7)';ctx.lineWidth=Math.max(2,sz/18);ctx.lineJoin='round';
-    ctx.strokeText(text,x,y);
-    ctx.shadowColor='transparent';ctx.shadowBlur=0;
-  }
-  ctx.fillStyle=color;
-  ctx.fillText(text,x,y);
-  ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
-}
-
-// ── RENDER ONE IMAGE ───────────────────────────────────
-// Returns a fresh 1080×1080 canvas with FX applied
-function renderOne(img, text, wm, fxType, fxStr, isAuto){
-  var base=document.createElement('canvas');base.width=1080;base.height=1080;
-  var ctx=base.getContext('2d');
-  var weight=(selW==='normal')?'normal':(selW==='bold'?'bold':'900');
-  var hasText=!!(text&&text.trim());
-
-  // 1. full image
-  if(img) ctx.drawImage(img,0,0,1080,1080);
-  else{ctx.fillStyle='#eee';ctx.fillRect(0,0,1080,1080);}
-
-  // 2. text panel
-  if(hasText){
-    var manSz=parseInt(document.getElementById('szRange').value)||0;
-    var sz;
-    if(isAuto){
-      var len=text.trim().length;
-      sz= len<=10?130 : len<=20?110 : len<=35?90 : len<=55?74 : len<=80?58 : len<=110?46 : 36;
-    } else {
-      sz=manSz>0 ? manSz : fitSize(ctx,text,selFont,weight,920);
-    }
-    sz=Math.max(sz,26);
-
-    ctx.font=weight+' '+sz+'px "'+selFont+'"';
-    var lines=wrapText(ctx,text,920);
-    var lh=sz*1.28;
-    var padT=sz*.75, padB=sz*.65;
-    var panH=Math.ceil(padT+lines.length*lh+padB);
-
-    var panY;
-    if(isAuto){
-      panY=0;
-    } else {
-      var cy=Math.round(1080*posTop.y);
-      panY=Math.max(0,Math.min(1080-panH,cy-Math.round(panH/2)));
+        if (ctx.measureText(test).width > maxWidth) {
+            lines.push(w);
+        } else {
+            lines[lines.length - 1] = test;
+        }
     }
 
-    var panCol=isAuto?'#ffffff':document.getElementById('colPanel').value;
-    ctx.fillStyle=panCol;
-    ctx.fillRect(0,panY,1080,panH);
+    return lines;
+}
 
-    var txtCol=isAuto?'#000000':document.getElementById('colText').value;
-    var xPos=selAl==='center'?540:(selAl==='left'?80:1000);
-    ctx.font=weight+' '+sz+'px "'+selFont+'"';
-    ctx.textAlign=selAl;
-    var y=panY+padT+sz*.82;
-    lines.forEach(function(line){
-      drawLine(ctx,line,xPos,y,sz,txtCol);
-      y+=lh;
+// -------- AUTO SIZE TEXT --------
+function autoSize(ctx, text) {
+    let size = 90;
+
+    while (size > 28) {
+        ctx.font = `${size}px Arial`;
+        if (ctx.measureText(text).width < 900) break;
+        size -= 2;
+    }
+
+    return size;
+}
+
+// -------- RENDER BASE IMAGE --------
+function renderBase(file, text, font, wm) {
+
+    return new Promise(res => {
+
+        let img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        img.onload = () => {
+
+            let c = document.createElement("canvas");
+            c.width = 1080;
+            c.height = 1080;
+            let ctx = c.getContext("2d");
+
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, 1080, 1080);
+
+            let size = autoSize(ctx, text);
+
+            ctx.font = `${size}px "${font}"`;
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#000";
+
+            let lines = smartWrap(ctx, text, 900);
+
+            let y = (lines.length === 1) ? 220 : 120;
+
+            let lineH = size + 10;
+
+            for (let l of lines) {
+                ctx.fillText(l, 540, y);
+                y += lineH;
+            }
+
+            ctx.drawImage(img, 0, y, 1080, 1080 - y);
+
+            if (wm) {
+                ctx.font = "40px Arial";
+                ctx.textAlign = "center";
+
+                // чорна обводка
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 8;
+                ctx.strokeText(wm, 540, 1040);
+
+                // білий текст
+                ctx.fillStyle = "#fff";
+                ctx.fillText(wm, 540, 1040);
+            }
+
+            res(c);
+        };
     });
-  }
-
-  // 3. watermark
-  if(wm){
-    ctx.font='bold 36px "Unbounded"';ctx.textAlign='center';
-    ctx.shadowColor='rgba(0,0,0,0.85)';ctx.shadowBlur=14;
-    ctx.strokeStyle='rgba(0,0,0,0.9)';ctx.lineWidth=9;
-    ctx.strokeText(wm,540,1054);
-    ctx.fillStyle='rgba(255,255,255,0.93)';
-    ctx.fillText(wm,540,1054);
-    ctx.shadowColor='transparent';ctx.shadowBlur=0;
-  }
-
-  // 4. apply FX on full composition (text+panel+image all pixelated together)
-  return applyFx(base,fxType,fxStr);
 }
 
-// ── LIVE PREVIEW ───────────────────────────────────────
-function updatePreview(){
-  var texts=getTexts();
-  var text=texts[0]||'';
-  var wm=watermarks.length?watermarks[0]:'';
-  var fxS=parseInt(document.getElementById('fxStr').value)||10;
-  var isAuto=document.getElementById('autoTgl').checked;
+// -------- MAKE PIXELATED COPY --------
+function makePixelCopy(base, pixel) {
 
-  var c=renderOne(prevImg,text,wm,'none',fxS,isAuto);
-  var dest=document.getElementById('edCanvas');
-  var dctx=dest.getContext('2d');
-  dctx.clearRect(0,0,1080,1080);
-  dctx.drawImage(c,0,0);
+    let c2 = document.createElement("canvas");
+    c2.width = 1080;
+    c2.height = 1080;
 
-  if(!isAuto) syncHandle();
+    let ctx2 = c2.getContext("2d");
+
+    ctx2.drawImage(base, 0, 0);
+
+    if (pixel > 1) {
+        pixelate(c2, ctx2, pixel);
+    }
+
+    return c2;
 }
 
-function syncHandle(){
-  var h=document.getElementById('hTop'),hl=document.getElementById('hTopL');
-  h.style.left=(posTop.x*100)+'%';h.style.top=(posTop.y*100)+'%';
-  hl.style.left=(posTop.x*100)+'%';hl.style.top='calc('+(posTop.y*100)+'% + 14px)';
+// -------- GENERATE GALLERY --------
+async function generate() {
+
+    let texts = document.getElementById("texts").value.split("///");
+    let font = document.getElementById("font").value;
+    let pixel = parseInt(document.getElementById("pixel").value);
+    let watermarks = document.getElementById("wm").value.split("///");
+
+    let gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
+
+    for (let i = 0; i < files.length; i++) {
+
+        let base = await renderBase(
+            files[i],
+            texts[i] || "",
+            font,
+            watermarks[i] || watermarks[0] || ""
+        );
+
+        let normal = base.toDataURL("image/jpeg", 0.95);
+        let pix = makePixelCopy(base, pixel).toDataURL("image/jpeg", 0.95);
+
+        let row = document.createElement("div");
+        row.className = "row";
+
+        row.innerHTML = `
+            <div class="card">
+                <div class="small">${i + 1}pic</div>
+                <img src="${normal}">
+            </div>
+
+            <div class="card">
+                <div class="small">${i + 1}pix</div>
+                <img src="${pix}">
+            </div>
+        `;
+
+        gallery.appendChild(row);
+    }
 }
 
-// drag handle
-(function(){
-  var el=document.getElementById('hTop'), drag=false;
-  function pos(e){
-    var r=document.getElementById('edWrap').getBoundingClientRect();
-    var cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
-    var cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
-    posTop.x=Math.max(0,Math.min(1,cx/r.width));
-    posTop.y=Math.max(0,Math.min(1,cy/r.height));
-  }
-  el.addEventListener('mousedown',function(e){drag=true;e.preventDefault();});
-  el.addEventListener('touchstart',function(e){drag=true;e.preventDefault();},{passive:false});
-  document.addEventListener('mousemove',function(e){if(!drag)return;pos(e);updatePreview();});
-  document.addEventListener('touchmove',function(e){if(!drag)return;pos(e);updatePreview();},{passive:false});
-  document.addEventListener('mouseup',function(){drag=false;});
-  document.addEventListener('touchend',function(){drag=false;});
-})();
-
-// ── GENERATE ───────────────────────────────────────────
-async function generate(){
-  if(!files.length){toast('Спочатку вибери фото');return;}
-
-  var texts=getTexts(); // ['text0','text1','text2',...]
-  var wms=watermarks.length?watermarks:[''];
-  var fxS=parseInt(document.getElementById('fxStr').value)||10;
-  var isAuto=document.getElementById('autoTgl').checked;
-  var fxCopy=(selFx==='none'&&isAuto)?'vignette':selFx;
-  var fxLbl=(selFx==='none'&&isAuto)?'soft':(selFx==='none'?'copy':selFx);
-
-  var btn=document.getElementById('genBtn');
-  var pgf=document.getElementById('pgf');
-  btn.disabled=true;
-  document.getElementById('pg').classList.add('show');
-  cache=[];
-
-  var galOut=document.getElementById('galOut');
-  galOut.innerHTML=
-    '<div id="galT" style="font-size:9px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--tx3);margin-bottom:16px">Генерація...</div>'+
-    '<div id="zipRow" style="display:none;margin-bottom:14px"><button class="db pr" id="zipBtn" style="padding:10px 20px;font-size:10px">↓ Завантажити все ZIP</button></div>'+
-    '<div class="gg" id="gg"></div>';
-  var gg=document.getElementById('gg');
-  var isMob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  for(var i=0;i<files.length;i++){
-    pgf.style.width=((i/files.length)*100)+'%';
-    await new Promise(function(r){setTimeout(r,0);}); // yield to UI
-
-    var img=await new Promise(function(r){
-      var m=new Image();
-      m.onload=function(){r(m);};
-      m.onerror=function(){r(null);};
-      m.src=URL.createObjectURL(files[i]);
-    });
-    if(!img) continue;
-
-    var tt=i<texts.length?texts[i]:'';   // text for this photo
-    var wm=wms[i%wms.length]||'';
-
-    var origC=renderOne(img,tt,wm,'none',fxS,isAuto);
-    var fxC  =renderOne(img,tt,wm,fxCopy,fxS,isAuto);
-    var origU=origC.toDataURL('image/jpeg',0.95);
-    var fxU  =fxC.toDataURL('image/jpeg',0.95);
-    var ci=cache.length;
-    cache.push({orig:origC,fx:fxC,name:files[i].name,text:tt});
-
-    var card=document.createElement('div');
-    card.className='card';card.style.animationDelay=(i*.06)+'s';
-
-    var bO=isMob
-      ?'<button class="db"    onclick="openFull('+ci+',\'orig\')">📱 Orig</button>'
-      :'<button class="db"    onclick="dl('+ci+',\'orig\')">↓ Orig</button>';
-    var bF=isMob
-      ?'<button class="db pr" onclick="openFull('+ci+',\'fx\')">📱 '+fxLbl+'</button>'
-      :'<button class="db pr" onclick="dl('+ci+',\'fx\')">↓ '+fxLbl+'</button>';
-    var bB=isMob?''
-      :'<button class="db"    onclick="dl('+ci+',\'both\')">↓ Обидва</button>';
-
-    card.innerHTML=
-      '<div class="ci">'+
-        '<div class="ch" onclick="'+(isMob?'openFull('+ci+',\'orig\')':'dl('+ci+',\'orig\')')+'">'+
-          '<img src="'+origU+'" loading="lazy" style="aspect-ratio:1;object-fit:cover">'+
-          '<div class="chl">orig</div></div>'+
-        '<div class="ch" onclick="'+(isMob?'openFull('+ci+',\'fx\')':'dl('+ci+',\'fx\')')+'">'+
-          '<img src="'+fxU+'" loading="lazy" style="aspect-ratio:1;object-fit:cover">'+
-          '<div class="chl">'+fxLbl+'</div></div>'+
-      '</div>'+
-      '<div class="cact">'+bO+bF+bB+'</div>';
-    gg.appendChild(card);
-  }
-
-  pgf.style.width='100%';
-  setTimeout(function(){document.getElementById('pg').classList.remove('show');pgf.style.width='0';},600);
-  btn.disabled=false;
-
-  document.getElementById('galT').textContent='Готово — '+cache.length+' фото';
-
-  if(cache.length){
-    document.getElementById('zipRow').style.display='block';
-    document.getElementById('zipBtn').onclick=async function(){
-      toast('Пакуємо ZIP...');
-      var zip=new JSZip();
-      cache.forEach(function(c,i){
-        zip.file((i+1)+'_orig.jpg',c.orig.toDataURL('image/jpeg',0.95).split(',')[1],{base64:true});
-        zip.file((i+1)+'_fx.jpg',  c.fx.toDataURL('image/jpeg',0.95).split(',')[1],  {base64:true});
-      });
-      var blob=await zip.generateAsync({type:'blob'});
-      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='motiv.zip';a.click();
-      toast('✦ ZIP завантажено');
-    };
-  }
-  toast('✦ '+cache.length+' фото готово');
-}
-
-// ── DOWNLOAD / OPEN ────────────────────────────────────
-function dl(i,which){
-  var c=cache[i];if(!c)return;
-  var base=c.name.replace(/\.[^.]+$/,'')||'motiv';
-  function save(canvas,suf){
-    var a=document.createElement('a');
-    a.href=canvas.toDataURL('image/jpeg',0.95);
-    a.download=base+'_'+suf+'.jpg';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-  }
-  if(which==='both'){save(c.orig,'orig');setTimeout(function(){save(c.fx,'fx');},300);}
-  else if(which==='fx') save(c.fx,'fx');
-  else save(c.orig,'orig');
-}
-
-function openFull(i,which){
-  var c=cache[i];if(!c)return;
-  var isMob=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if(!isMob){dl(i,which||'orig');return;}
-  var canvas=which==='fx'?c.fx:c.orig;
-  var ov=document.createElement('div');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:16px';
-  var hint=document.createElement('div');
-  hint.innerHTML='Затримай палець на фото<br><span style="font-size:9px;color:#6A6058">→ «Зберегти зображення»</span>';
-  hint.style.cssText='font-family:Unbounded,sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#C9A84C;text-align:center;line-height:1.8';
-  var img=document.createElement('img');
-  img.src=canvas.toDataURL('image/jpeg',0.95);
-  img.style.cssText='max-width:100%;max-height:70vh;border-radius:12px;display:block';
-  var btn=document.createElement('button');
-  btn.textContent='✕ Закрити';
-  btn.style.cssText='background:transparent;border:1px solid rgba(201,168,76,.35);border-radius:40px;color:#C9A84C;font-family:Unbounded,sans-serif;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:10px 24px;cursor:pointer';
-  btn.onclick=function(){document.body.removeChild(ov);};
-  ov.appendChild(hint);ov.appendChild(img);ov.appendChild(btn);
-  document.body.appendChild(ov);
-}
-
-// ── TOAST ──────────────────────────────────────────────
-function toast(msg){
-  var el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(function(){el.classList.remove('show');},2400);
-}
-
-// init
-updatePreview();
 </script>
+
 </body>
 </html>
